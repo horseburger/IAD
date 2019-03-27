@@ -2,6 +2,15 @@ import sys
 import numpy as np
 import random
 
+fr = open("in.txt", 'r')
+fw = open("out.txt", 'w')
+w = [random.uniform(-1, 1), random.uniform(-1, 1)]
+
+step = random.random()
+
+fread = fr.readlines()
+fread = [s.replace('\n', '') for s in fread]
+
 
 def f(x, w):
     return 1/(1+np.exp(-(float(x)*float(w[1]) + float(w[0]))))
@@ -23,14 +32,10 @@ def derivative(x, y, w):
     return res/len(x)
 
 
-fr = open("in.txt", 'r')
-fw = open("out.txt", 'w')
+
 
 # x = np.arange(-1., -1., 0.1)
-w = [random.uniform(-1, 1), random.uniform(-1, 1)]
 
-fread = fr.readlines()
-fread = [s.replace('\n', '') for s in fread]
 
 x = []
 y = []
