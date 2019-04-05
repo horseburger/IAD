@@ -6,14 +6,14 @@ import numpy as np
 import matplotlib.pyplot as plt
 # import bigfloat
 
-if (len(sys.argv) < 3):
-    print("Usage: python main.py <input file> <mode>\nOn-line - 0\nOff-line - 1")
+if (len(sys.argv) < 4):
+    print("Usage: python main.py <input file> <mode> <iterations>\nOn-line - 0\nOff-line - 1")
     exit()
 
 typ = sys.argv[2]
 alpha = 0.1
 eps = 0.0001
-it = 10000
+it = int(sys.argv[3])
 
 
 def inFile():
@@ -37,7 +37,7 @@ def saveRightGraph(filename, w):
     plt.clf()
     plt.axis([-3, 5, -0.5, 1.2])
 
-    x = np.arange(-3., 6., 0.1)
+    x = np.arange(-3., 6., 0.05)
 
     plt.plot(x, offLine_findParams(x, 0, w[0], w[1], w[2], 1))
     plt.savefig(filename)
