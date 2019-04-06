@@ -169,42 +169,15 @@ class Neuron:
                     c.append(self.calcError(b1[k], self.x[i][1]))
                     c.append(self.calcError(b1[k], self.x[i][2]))
 
+
                     for l in range(len(c)):
                         self.w1[k][l] -= self.alpha * c[l]
-
-                # c = [self.calcError(b1[0], 1)]
-                # c.append(self.calcError(b1[0], self.x[i][0]))
-                # c.append(self.calcError(b1[0], self.x[i][1]))
-                # c.append(self.calcError(b1[0], self.x[i][2]))
-
-                # # if self.checkWeights(c):
-                # #     flag = True
-                # #     break
+                
+                if flag:
+                    break
 
                 
-                # c = [self.calcError(b1[1], 1)]
-                # c.append(self.calcError(b1[1], self.x[i][0]))
-                # c.append(self.calcError(b1[1], self.x[i][1]))
-                # c.append(self.calcError(b1[1], self.x[i][2]))
 
-                # # if self.checkWeights(c):
-                # #     flag = True
-                # #     break
-
-                # for k in range(len(c)):
-                #     self.w1[1][k] -= self.alpha * c[k]
-
-                # c = [self.calcError(b1[2], 1)]
-                # c.append(self.calcError(b1[2], self.x[i][0]))
-                # c.append(self.calcError(b1[2], self.x[i][1]))
-                # c.append(self.calcError(b1[2], self.x[i][2]))
-
-                # # if self.checkWeights(c):
-                # #     flag = True
-                # #     break
-
-                # for k in range(len(c)):
-                #     self.w1[2][k] -= self.alpha * c[k]
 
             if flag:
                 break
@@ -219,11 +192,6 @@ class Neuron:
         self.saveErrorPlot("error.png", error)
         return self.w1, self.w2
 
-
-
-    def checkWeights(self, c):
-        if np.all(np.abs(c) < self.eps):
-            return True
 
     def inFile(self, filename):
         file = open(filename)
