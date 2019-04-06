@@ -146,8 +146,8 @@ def offLine_findParams(x, y, w11, w12, w2, mode):
         chng2 = offLine_calcError(b2, y11)
         chng3 = offLine_calcError(b2, y12)
 
-        # if chng1 < eps or chng2 < eps or chng3 < eps:
-            # break
+        if abs(chng1) < eps and abs(chng2) < eps and abs(chng3) < eps:
+            break
 
         w2[0] -= alpha * chng1
         w2[1] -= alpha * chng2
@@ -162,8 +162,8 @@ def offLine_findParams(x, y, w11, w12, w2, mode):
         chng3 = offLine_calcError(b12, oneVec)
         chng4 = offLine_calcError(b12, x)
 
-        # if chng1 < eps or chng2 < eps or chng3 < eps or chng4 < eps:
-            # break
+        if abs(chng1) < eps and abs(chng2) < eps and abs(chng3) < eps and abs(chng4) < eps:
+            break
 
         w11[0] -= alpha * chng1
         w11[1] -= alpha * chng2
@@ -200,6 +200,7 @@ def onLine_findParams(x, y, w11, w12, w2, mode):
     
     oneVec = [1 for i in range(len(x))]
     error = []
+    flag = False
     for j in range(it):
         y11 = 0
         y12 = 0
@@ -232,25 +233,36 @@ def onLine_findParams(x, y, w11, w12, w2, mode):
 
             b2 = offLine_calcTopB(a2, y[i])
 
+            chng1 = onLine_calcError(b2, 1)
+            chng2 = onLine_calcError(b2, y11)
+            chng3 = onLine_calcError(b2, y12)
 
-            w2[0] -= alpha * onLine_calcError(b2, 1)
-            w2[1] -= alpha * onLine_calcError(b2, y11)
-            w2[2] -= alpha * onLine_calcError(b2, y12)
-
-            if np.all(np.abs(w2) < eps):
+            if abs(chng1) < eps and abs(chng2) < eps and abs(chng3) < eps:
+                flag = True
                 break
+
+            w2[0] -= alpha * chng1
+            w2[1] -= alpha * chng2
+            w2[2] -= alpha * chng3
+
 
             b11 = offLine_calcLowB(b2, w2[1], a11)
             b12 = offLine_calcLowB(b2, w2[2], a12)
 
-            w11[0] -= alpha * onLine_calcError(b11, 1)
-            w11[1] -= alpha * onLine_calcError(b11, x[i])
-            w12[0] -= alpha * onLine_calcError(b12, 1)
-            w12[1] -= alpha * onLine_calcError(b12, x[i])
+            chng1 = onLine_calcError(b11, 1)
+            chng2 = onLine_calcError(b11, x[i])
+            chng3 = onLine_calcError(b12, 1)
+            chng4 = onLine_calcError(b12, x[i])
 
-
-            if np.all(np.abs(w11) < eps) or np.all(np.abs(w12) < eps):
+            if abs(chng1) < eps and abs(chng2) < eps and abs(chng3) < eps and abs(chng4) < eps:
+                flag = True
                 break
+
+            w11[0] -= alpha * chng1
+            w11[1] -= alpha * chng2
+            w12[0] -= alpha * chng3
+            w12[1] -= alpha * chng4
+
 
 
         if mode:
@@ -259,6 +271,8 @@ def onLine_findParams(x, y, w11, w12, w2, mode):
         if j == 0:
             saveGraph("wrong.png", result)
 
+        if flag:
+            break
         
 
         s = random()
