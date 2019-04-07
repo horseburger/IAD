@@ -14,7 +14,7 @@ class Neuron:
         self.momentum = 0
         self.bias = True
         self.eps = 0.0001
-        self.number = n
+        self.number = int(n)
 
         self.w1 = np.array([[random(), random(), random(), random(), random()]])
                 #    [random(), random(), random(), random(), random()],
@@ -68,7 +68,7 @@ class Neuron:
         return sum
 
     def run(self):
-        return self.findParams(3)
+        return self.findParams(self.number)
 
     def findParams(self, n):
         error = []
@@ -214,6 +214,7 @@ class Neuron:
     def saveErrorPlot(self, filename, error):
         plt.clf()
 
+
         x = []
         e1 = []
         e2 = []
@@ -231,4 +232,7 @@ class Neuron:
         plt.plot(x, e2, 'b')
         plt.plot(x, e3, 'g-')
         plt.plot(x, e4)
+        plt.ylabel("Wartość błędu")
+        plt.xlabel("Ilość iteracji")
+        plt.title("Wykres zależności wartości błędu od ilości iteracji")
         plt.savefig(filename)
