@@ -45,10 +45,10 @@ class Neuron:
         y = self.sigmoid(a)
         return y * (1 - y)
 
-    def lowB(self, b, w, a):
+    def lowB(self, b, w, a, k):
         sum = 0
-        for i in range(len(b)):
-            sum += b[i] * w[i]
+        for i in range(len(w)):
+            sum += b[i] * w[i][k]
         
         return sum * self.sigmoid_derivative(a)
     
@@ -159,8 +159,9 @@ class Neuron:
                 for k in range(len(c)):
                     self.w2[3][k] -= self.alpha * c[k]
 
-                for k in range(1, len(self.w2)):
-                    b1.append(self.lowB(b2, self.w2[k], a1[k - 1]))
+
+                for k in range(1, self.number + 1):
+                    b1.append(self.lowB(b2, self.w2, a1[k - 1], k))
 
                 for k in range(len(b1)):
                     c = []
@@ -212,7 +213,6 @@ class Neuron:
         
 
     def saveErrorPlot(self, filename, error):
-        plt.clf()
 
 
         x = []
@@ -228,10 +228,23 @@ class Neuron:
             e4.append(error[i][3])
         
         plt.axis([0, len(error), 0, 0.3])
-        plt.plot(x, e1, 'r')
-        plt.plot(x, e2, 'b')
-        plt.plot(x, e3, 'g-')
-        plt.plot(x, e4)
+        if self.number == 1:
+            plt.plot(x, e1, 'r')
+            plt.plot(x, e2, 'r')
+            plt.plot(x, e3, 'r')
+            plt.plot(x, e4, 'r')
+        else: 
+            if self.number == 2:
+                plt.plot(x, e1, 'g')
+                plt.plot(x, e2, 'g')
+                plt.plot(x, e3, 'g')
+                plt.plot(x, e4, 'g')
+            else:
+                if self.number == 3:
+                    plt.plot(x, e1, 'b')
+                    plt.plot(x, e2, 'b')
+                    plt.plot(x, e3, 'b')
+                    plt.plot(x, e4, 'b')
         plt.ylabel("Wartosc bledu")
         plt.xlabel("Ilosc iteracji")
         plt.title("Wykres zaleznosci wartosci bledu od ilosci iteracji")
