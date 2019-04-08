@@ -229,23 +229,24 @@ class Neuron:
         
         plt.axis([0, len(error), 0, 0.3])
         if self.number == 1:
-            plt.plot(x, e1, 'r')
+            plt.plot(x, e1, 'r', label="1 neuron w warstwie ukrytej")
             plt.plot(x, e2, 'r')
             plt.plot(x, e3, 'r')
             plt.plot(x, e4, 'r')
         else: 
             if self.number == 2:
-                plt.plot(x, e1, 'g')
+                plt.plot(x, e1, 'g', label="2 neurony w warstwie ukrytej")
                 plt.plot(x, e2, 'g')
                 plt.plot(x, e3, 'g')
                 plt.plot(x, e4, 'g')
             else:
                 if self.number == 3:
-                    plt.plot(x, e1, 'b')
+                    plt.plot(x, e1, 'b', label="3 neurony w warstwie ukrytej")
                     plt.plot(x, e2, 'b')
                     plt.plot(x, e3, 'b')
                     plt.plot(x, e4, 'b')
         plt.ylabel("Wartosc bledu")
         plt.xlabel("Ilosc iteracji")
         plt.title("Wykres zaleznosci wartosci bledu od ilosci iteracji")
+        plt.legend()
         plt.savefig(filename)
