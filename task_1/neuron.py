@@ -14,18 +14,18 @@ class Neuron:
         self.momentum = 0
         self.bias = True
         self.eps = 0.0001
-        self.number = n
+        self.number = int(n)
 
         self.w1 = np.array([[random(), random(), random(), random(), random()]])
-                #    [random(), random(), random(), random(), random()],
-                #    [random(), random(), random(), random(), random()]])
         for i in range(self.number - 1):
             self.w1 = np.append(self.w1, [[random(), random(), random(), random(), random()]], axis=0)
 
-        self.w2 = np.array([[random(), random(), random(), random()],
-                   [random(), random(), random(), random()],
-                   [random(), random(), random(), random()],
-                   [random(), random(), random(), random()]])
+        self.w2 = np.array([[random(), random()],
+                   [random(), random()],
+                   [random(), random()],
+                   [random(), random()]])
+        for i in range(self.number - 1):
+            self.w2 = np.concatenate((self.w2, [[random()], [random()], [random()], [random()]]), axis=1)
     
 
     def cost(self, result, y):
@@ -68,7 +68,7 @@ class Neuron:
         return sum
 
     def run(self):
-        return self.findParams(3)
+        return self.findParams(self.number)
 
     def findParams(self, n):
         error = []
@@ -159,7 +159,7 @@ class Neuron:
                 for k in range(len(c)):
                     self.w2[3][k] -= self.alpha * c[k]
 
-                for k in range(1, self.number + 1):
+                for k in range(1, len(self.w2)):
                     b1.append(self.lowB(b2, self.w2[k], a1[k - 1]))
 
                 for k in range(len(b1)):
@@ -214,6 +214,7 @@ class Neuron:
     def saveErrorPlot(self, filename, error):
         plt.clf()
 
+
         x = []
         e1 = []
         e2 = []
@@ -231,4 +232,7 @@ class Neuron:
         plt.plot(x, e2, 'b')
         plt.plot(x, e3, 'g-')
         plt.plot(x, e4)
+        plt.ylabel("Wartosc bledu")
+        plt.xlabel("Ilosc iteracji")
+        plt.title("Wykres zaleznosci wartosci bledu od ilosci iteracji")
         plt.savefig(filename)
