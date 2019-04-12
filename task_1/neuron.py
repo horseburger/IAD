@@ -11,7 +11,7 @@ class Neuron:
         self.x = self.inFile(filename)
         # self.y = self.x
         self.it = int(it)
-        self.momentum = 0
+        self.momentum = 0.2
         self.bias = True
         self.eps = 0.0001
         self.number = int(n)
@@ -37,6 +37,9 @@ class Neuron:
 
     def calcError(self, b, x):
         return b * x
+
+    def calcMomentum(self, m, w):
+        return m * self.alpha * w
 
     def sigmoid(self, a):
         return 1 / (1 + np.exp(-a))
@@ -74,6 +77,8 @@ class Neuron:
         error = []
         oneVec = [1 for i in range(len(self.x))]
         flag = False
+        prevw2 = [0, 0, 0, 0]
+        prevw1 = [0 for i in range(self.number)]
 
         for j in range(self.it):
             
@@ -92,6 +97,9 @@ class Neuron:
 
                 b1 = []
                 b2 = []
+
+                m1 = []
+                m2 = []
 
                 for k in range(len(self.w1)):
                     a1.append(self.calcA(self.x[i], self.w1[k]))
@@ -118,50 +126,87 @@ class Neuron:
                 c = [self.calcError(b2[0], 1)]
                 for k in range(len(y1)):
                     c.append(self.calcError(b2[0], y1[k]))
+                    
+                    
+                if i != 0:
+                    for k in range(len(c)):
+                        m2.append(self.calcMomentum(self.momentum, prevw2[0][k]))
 
-                # if self.checkWeights(c):
-                #     flag = True
-                #     break
+                prevw2[0] = c
 
                 for k in range(len(c)):
-                    self.w2[0][k] -= self.alpha * c[k]
+                    if i != 0:
+                        self.w2[0][k] -= self.alpha * c[k] + m2[k]
+                    else:
+                        self.w2[0][k] -= self.alpha * c[k] 
+                    
                 
                 c = [self.calcError(b2[1], 1)]
+                m2 = []
                 for k in range(len(y1)):
                     c.append(self.calcError(b2[1], y1[k]))
+                
+                if i != 0:
+                    for k in range(len(c)):
+                        m2.append(self.calcMomentum(self.momentum, prevw2[1][k]))
 
-                # if self.checkWeights(c):
-                #     flag = True
-                #     break
+                prevw2[1] = c
+
                 
                 for k in range(len(c)):
-                    self.w2[1][k] -= self.alpha * c[k]
+                    if i != 0:
+                        self.w2[1][k] -= self.alpha * c[k] + m2[k]
+                    else:
+                        self.w2[1][k] -= self.alpha * c[k]
 
                 c = [self.calcError(b2[2], 1)]
+                m2 = []
                 for k in range(len(y1)):
                     c.append(self.calcError(b2[2], y1[k]))
+                
+                if i != 0:
+                    for k in range(len(c)):
+                        m2.append(self.calcMomentum(self.momentum, prevw2[1][k]))
 
-                # if self.checkWeights(c):
-                #     flag = True
-                #     break
+                prevw2[2] = c
+
 
                 for k in range(len(c)):
-                    self.w2[2][k] -= self.alpha * c[k]
+                    if i != 0:
+                        self.w2[2][k] -= self.alpha * c[k] + m2[k]
+                    else:
+                        self.w2[2][k] -= self.alpha * c[k]
 
                 c = [self.calcError(b2[3], 1)]
+                m2 = []
                 for k in range(len(y1)):
                     c.append(self.calcError(b2[3], y1[k]))
+                
+                if i != 0:
+                    for k in range(len(c)):
+                        m2.append(self.calcMomentum(self.momentum, prevw2[3][k]))
 
-                # if self.checkWeights(c):
-                #     flag = True
-                #     break
+                prevw2[3] = c
+
                 
                 for k in range(len(c)):
-                    self.w2[3][k] -= self.alpha * c[k]
+                    if i != 0:
+                        self.w2[3][k] -= self.alpha * c[k] + m2[k]
+                    else:
+                        self.w2[3][k] -= self.alpha * c[k]
 
 
                 for k in range(1, self.number + 1):
                     b1.append(self.lowB(b2, self.w2, a1[k - 1], k))
+
+                if i != 0:
+                    for k in range(self.number):
+                        m1.append([self.calcMomentum(self.momentum, prevw1[k][0]),
+                        self.calcMomentum(self.momentum, prevw1[k][1]),
+                        self.calcMomentum(self.momentum, prevw1[k][2]),
+                        self.calcMomentum(self.momentum, prevw1[k][3]),
+                        self.calcMomentum(self.momentum, prevw1[k][4])])
+
 
                 for k in range(len(b1)):
                     c = []
@@ -169,16 +214,21 @@ class Neuron:
                     c.append(self.calcError(b1[k], self.x[i][0]))
                     c.append(self.calcError(b1[k], self.x[i][1]))
                     c.append(self.calcError(b1[k], self.x[i][2]))
+                    c.append(self.calcError(b1[k], self.x[i][3]))
+
+                    prevw1[k] = c
 
 
                     for l in range(len(c)):
-                        self.w1[k][l] -= self.alpha * c[l]
+                        if i != 0:
+                            self.w1[k][l] -= self.alpha * c[l] + m1[k][l]
+                        else:
+                            self.w1[k][l] -= self.alpha * c[l]
+
+                
                 
                 if flag:
                     break
-
-                
-
 
             if flag:
                 break
