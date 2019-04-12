@@ -13,7 +13,7 @@ class Neuron:
         self.it = int(it)
         self.momentum = 0.2
         self.bias = True
-        self.eps = 0.0001
+        self.eps = 0.001
         self.number = int(n)
 
         self.w1 = np.array([[random(), random(), random(), random(), random()]])
@@ -39,7 +39,7 @@ class Neuron:
         return b * x
 
     def calcMomentum(self, m, w):
-        return m * self.alpha * w
+        return m * w
 
     def sigmoid(self, a):
         return 1 / (1 + np.exp(-a))
@@ -79,161 +79,167 @@ class Neuron:
         flag = False
         prevw2 = [0, 0, 0, 0]
         prevw1 = [0 for i in range(self.number)]
-
-        for j in range(self.it):
-            
-
-
-            result = []
+        try:
+            for j in range(self.it):
+                
 
 
-            for i in range(len(self.x)):
-                y1 = []
-                y2 = []
+                result = []
 
 
-                a1 = []
-                a2 = []
-
-                b1 = []
-                b2 = []
-
-                m1 = []
-                m2 = []
-
-                for k in range(len(self.w1)):
-                    a1.append(self.calcA(self.x[i], self.w1[k]))
+                for i in range(len(self.x)):
+                    y1 = []
+                    y2 = []
 
 
-                for k in range(len(a1)):
-                    y1.append(self.sigmoid(a1[k]))
+                    a1 = []
+                    a2 = []
 
-                for k in range(len(self.w2)):
-                    a2.append(self.calcA(y1, self.w2[k]))
+                    b1 = []
+                    b2 = []
 
-                for k in range(len(a2)):
-                    y2.append(self.sigmoid(a2[k]))
+                    m1 = []
+                    m2 = []
 
-                result.append(y2)
-
-                error.append(self.cost(result[-1], self.x[i]))
-                print(error[-1])
-
-                for k in range(len(a2)):
-                    b2.append(self.highB(a2[k], self.x[i][k]))
+                    for k in range(len(self.w1)):
+                        a1.append(self.calcA(self.x[i], self.w1[k]))
 
 
-                c = [self.calcError(b2[0], 1)]
-                for k in range(len(y1)):
-                    c.append(self.calcError(b2[0], y1[k]))
-                    
-                    
-                if i != 0:
-                    for k in range(len(c)):
-                        m2.append(self.calcMomentum(self.momentum, prevw2[0][k]))
+                    for k in range(len(a1)):
+                        y1.append(self.sigmoid(a1[k]))
 
-                prevw2[0] = c
+                    for k in range(len(self.w2)):
+                        a2.append(self.calcA(y1, self.w2[k]))
 
-                for k in range(len(c)):
+                    for k in range(len(a2)):
+                        y2.append(self.sigmoid(a2[k]))
+
+                    result.append(y2)
+
+                    error.append(self.cost(result[-1], self.x[i]))
+                    print(error[-1])
+
+                    for k in range(len(a2)):
+                        b2.append(self.highB(a2[k], self.x[i][k]))
+
+
+                    c = [self.calcError(b2[0], 1)]
+                    for k in range(len(y1)):
+                        c.append(self.calcError(b2[0], y1[k]))
+                        
+                        
                     if i != 0:
-                        self.w2[0][k] -= self.alpha * c[k] + m2[k]
-                    else:
-                        self.w2[0][k] -= self.alpha * c[k] 
-                    
-                
-                c = [self.calcError(b2[1], 1)]
-                m2 = []
-                for k in range(len(y1)):
-                    c.append(self.calcError(b2[1], y1[k]))
-                
-                if i != 0:
+                        for k in range(len(c)):
+                            m2.append(self.calcMomentum(self.momentum, prevw2[0][k]))
+
+                    prevw2[0] = [q * self.alpha for q in c]
+
                     for k in range(len(c)):
-                        m2.append(self.calcMomentum(self.momentum, prevw2[1][k]))
-
-                prevw2[1] = c
-
-                
-                for k in range(len(c)):
-                    if i != 0:
-                        self.w2[1][k] -= self.alpha * c[k] + m2[k]
-                    else:
-                        self.w2[1][k] -= self.alpha * c[k]
-
-                c = [self.calcError(b2[2], 1)]
-                m2 = []
-                for k in range(len(y1)):
-                    c.append(self.calcError(b2[2], y1[k]))
-                
-                if i != 0:
-                    for k in range(len(c)):
-                        m2.append(self.calcMomentum(self.momentum, prevw2[1][k]))
-
-                prevw2[2] = c
-
-
-                for k in range(len(c)):
-                    if i != 0:
-                        self.w2[2][k] -= self.alpha * c[k] + m2[k]
-                    else:
-                        self.w2[2][k] -= self.alpha * c[k]
-
-                c = [self.calcError(b2[3], 1)]
-                m2 = []
-                for k in range(len(y1)):
-                    c.append(self.calcError(b2[3], y1[k]))
-                
-                if i != 0:
-                    for k in range(len(c)):
-                        m2.append(self.calcMomentum(self.momentum, prevw2[3][k]))
-
-                prevw2[3] = c
-
-                
-                for k in range(len(c)):
-                    if i != 0:
-                        self.w2[3][k] -= self.alpha * c[k] + m2[k]
-                    else:
-                        self.w2[3][k] -= self.alpha * c[k]
-
-
-                for k in range(1, self.number + 1):
-                    b1.append(self.lowB(b2, self.w2, a1[k - 1], k))
-
-                if i != 0:
-                    for k in range(self.number):
-                        m1.append([self.calcMomentum(self.momentum, prevw1[k][0]),
-                        self.calcMomentum(self.momentum, prevw1[k][1]),
-                        self.calcMomentum(self.momentum, prevw1[k][2]),
-                        self.calcMomentum(self.momentum, prevw1[k][3]),
-                        self.calcMomentum(self.momentum, prevw1[k][4])])
-
-
-                for k in range(len(b1)):
-                    c = []
-                    c.append(self.calcError(b1[k], 1))
-                    c.append(self.calcError(b1[k], self.x[i][0]))
-                    c.append(self.calcError(b1[k], self.x[i][1]))
-                    c.append(self.calcError(b1[k], self.x[i][2]))
-                    c.append(self.calcError(b1[k], self.x[i][3]))
-
-                    prevw1[k] = c
-
-
-                    for l in range(len(c)):
                         if i != 0:
-                            self.w1[k][l] -= self.alpha * c[l] + m1[k][l]
+                            self.w2[0][k] -= self.alpha * c[k] + m2[k]
                         else:
-                            self.w1[k][l] -= self.alpha * c[l]
+                            self.w2[0][k] -= self.alpha * c[k] 
+                        
+                    
+                    c = [self.calcError(b2[1], 1)]
+                    m2 = []
+                    for k in range(len(y1)):
+                        c.append(self.calcError(b2[1], y1[k]))
+                    
+                    if i != 0:
+                        for k in range(len(c)):
+                            m2.append(self.calcMomentum(self.momentum, prevw2[1][k]))
 
-                
-                
+                    prevw2[1] = [q * self.alpha for q in c]
+
+                    
+                    for k in range(len(c)):
+                        if i != 0:
+                            self.w2[1][k] -= self.alpha * c[k] + m2[k]
+                        else:
+                            self.w2[1][k] -= self.alpha * c[k]
+
+                    c = [self.calcError(b2[2], 1)]
+                    m2 = []
+                    for k in range(len(y1)):
+                        c.append(self.calcError(b2[2], y1[k]))
+                    
+                    if i != 0:
+                        for k in range(len(c)):
+                            m2.append(self.calcMomentum(self.momentum, prevw2[1][k]))
+
+                    prevw2[2] = [q * self.alpha for q in c]
+
+
+                    for k in range(len(c)):
+                        if i != 0:
+                            self.w2[2][k] -= self.alpha * c[k] + m2[k]
+                        else:
+                            self.w2[2][k] -= self.alpha * c[k]
+
+                    c = [self.calcError(b2[3], 1)]
+                    m2 = []
+                    for k in range(len(y1)):
+                        c.append(self.calcError(b2[3], y1[k]))
+                    
+                    if i != 0:
+                        for k in range(len(c)):
+                            m2.append(self.calcMomentum(self.momentum, prevw2[3][k]))
+
+                    prevw2[3] = [q * self.alpha for q in c]
+
+
+                    
+                    for k in range(len(c)):
+                        if i != 0:
+                            self.w2[3][k] -= self.alpha * c[k] + m2[k]
+                        else:
+                            self.w2[3][k] -= self.alpha * c[k]
+
+
+                    for k in range(1, self.number + 1):
+                        b1.append(self.lowB(b2, self.w2, a1[k - 1], k))
+
+                    if i != 0:
+                        for k in range(self.number):
+                            m1.append([self.calcMomentum(self.momentum, prevw1[k][0]),
+                            self.calcMomentum(self.momentum, prevw1[k][1]),
+                            self.calcMomentum(self.momentum, prevw1[k][2]),
+                            self.calcMomentum(self.momentum, prevw1[k][3]),
+                            self.calcMomentum(self.momentum, prevw1[k][4])])
+
+
+                    for k in range(len(b1)):
+                        c = []
+                        c.append(self.calcError(b1[k], 1))
+                        c.append(self.calcError(b1[k], self.x[i][0]))
+                        c.append(self.calcError(b1[k], self.x[i][1]))
+                        c.append(self.calcError(b1[k], self.x[i][2]))
+                        c.append(self.calcError(b1[k], self.x[i][3]))
+
+                        prevw1[k] = [q * self.alpha for q in c]
+
+
+                        for l in range(len(c)):
+                            if i != 0:
+                                self.w1[k][l] -= self.alpha * c[l] + m1[k][l]
+                            else:
+                                self.w1[k][l] -= self.alpha * c[l]
+
+                    if (np.all(prevw2) < self.eps and np.all(prevw2) > 0) or (np.all(prevw1) < self.eps and np.all(prevw1) > 0):
+                        flag = True
+                        break
+                    
+                    
+                    if flag:
+                        break
+
                 if flag:
                     break
-
-            if flag:
-                break
-            
-            shuffle(self.x)
+                
+                shuffle(self.x)
+        except KeyboardInterrupt:
+            pass
 
         print("\nRESULTS:\n")
         for z in result:
@@ -260,8 +266,6 @@ class Neuron:
         return x
 
 
-        
-
     def saveErrorPlot(self, filename, error):
 
 
@@ -277,7 +281,14 @@ class Neuron:
             e3.append(error[i][2])
             e4.append(error[i][3])
         
-        plt.axis([0, len(error), 0, 0.3])
+        m = 0
+        for i in error:
+            for j in i:
+                if j > m:
+                    m = j
+        
+
+        plt.axis([0, len(error), 0, m])
         if self.number == 1:
             plt.plot(x, e1, 'r', label="1 neuron w warstwie ukrytej")
             plt.plot(x, e2, 'r')
@@ -290,7 +301,7 @@ class Neuron:
                 plt.plot(x, e3, 'g')
                 plt.plot(x, e4, 'g')
             else:
-                if self.number == 3:
+                if self.number > 2:
                     plt.plot(x, e1, 'b', label="3 neurony w warstwie ukrytej")
                     plt.plot(x, e2, 'b')
                     plt.plot(x, e3, 'b')
