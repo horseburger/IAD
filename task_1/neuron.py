@@ -13,7 +13,7 @@ class Neuron:
         self.it = int(it)
         self.momentum = 0.2
         self.bias = True
-        self.eps = 0.001
+        self.eps = 0.0001
         self.number = int(n)
 
         self.w1 = np.array([[random(), random(), random(), random(), random()]])
@@ -79,6 +79,8 @@ class Neuron:
         flag = False
         prevw2 = [0, 0, 0, 0]
         prevw1 = [0 for i in range(self.number)]
+        res_y1 = []
+        res_y2 = []
         try:
             for j in range(self.it):
                 
@@ -107,6 +109,8 @@ class Neuron:
 
                     for k in range(len(a1)):
                         y1.append(self.sigmoid(a1[k]))
+                    res_y1.append(y1[0])
+                    res_y2.append(y1[1])
 
                     for k in range(len(self.w2)):
                         a2.append(self.calcA(y1, self.w2[k]))
@@ -132,7 +136,10 @@ class Neuron:
                         for k in range(len(c)):
                             m2.append(self.calcMomentum(self.momentum, prevw2[0][k]))
 
-                    prevw2[0] = [q * self.alpha for q in c]
+                    if i != 0:
+                        prevw2[0] = [c[q] * self.alpha  + m2[q] for q in range(len(c))]
+                    else:
+                        prevw2[0] = [c[q] * self.alpha for q in range(len(c))]
 
                     for k in range(len(c)):
                         if i != 0:
@@ -150,7 +157,10 @@ class Neuron:
                         for k in range(len(c)):
                             m2.append(self.calcMomentum(self.momentum, prevw2[1][k]))
 
-                    prevw2[1] = [q * self.alpha for q in c]
+                    if i != 0:
+                        prevw2[1] = [c[q] * self.alpha  + m2[q] for q in range(len(c))]
+                    else:
+                        prevw2[1] = [c[q] * self.alpha for q in range(len(c))]
 
                     
                     for k in range(len(c)):
@@ -168,7 +178,10 @@ class Neuron:
                         for k in range(len(c)):
                             m2.append(self.calcMomentum(self.momentum, prevw2[1][k]))
 
-                    prevw2[2] = [q * self.alpha for q in c]
+                    if i != 0:
+                        prevw2[2] = [c[q] * self.alpha  + m2[q] for q in range(len(c))]
+                    else:
+                        prevw2[2] = [c[q] * self.alpha for q in range(len(c))]
 
 
                     for k in range(len(c)):
@@ -186,7 +199,10 @@ class Neuron:
                         for k in range(len(c)):
                             m2.append(self.calcMomentum(self.momentum, prevw2[3][k]))
 
-                    prevw2[3] = [q * self.alpha for q in c]
+                    if i != 0:
+                        prevw2[3] = [c[q] * self.alpha  + m2[q] for q in range(len(c))]
+                    else:
+                        prevw2[3] = [c[q] * self.alpha for q in range(len(c))]
 
 
                     
@@ -217,7 +233,10 @@ class Neuron:
                         c.append(self.calcError(b1[k], self.x[i][2]))
                         c.append(self.calcError(b1[k], self.x[i][3]))
 
-                        prevw1[k] = [q * self.alpha for q in c]
+                        if i != 0:
+                            prevw1[k] = [c[q] * self.alpha  + m1[k][q] for q in range(len(c))]
+                        else:
+                            prevw1[k] = [c[q] * self.alpha  for q in range(len(c))]
 
 
                         for l in range(len(c)):
@@ -226,13 +245,25 @@ class Neuron:
                             else:
                                 self.w1[k][l] -= self.alpha * c[l]
 
-                    if (np.all(prevw2) < self.eps and np.all(prevw2) > 0) or (np.all(prevw1) < self.eps and np.all(prevw1) > 0):
-                        flag = True
-                        break
                     
-                    
-                    if flag:
-                        break
+
+                    # if j > 100:
+                    #     for k in prevw2:
+                    #         if np.all(np.abs(k)) < self.eps:
+                    #             flag = True
+                    #             print(j)
+                    #             break
+                    #     for k in prevw1:
+                    #         for l in range(1, len(k)):
+                    #             if abs(k[l]) < self.eps and k[l] != 0:
+                    #                 flag = True
+                    #                 print(j)
+                    #                 break
+                    #         if flag:
+                    #             break
+
+                    # if flag:
+                    #     break
 
                 if flag:
                     break
@@ -247,7 +278,7 @@ class Neuron:
         
             
         self.saveErrorPlot("error.png", error)
-        return self.w1, self.w2
+        return self.w1, self.w2, res_y1, res_y2
 
 
     def inFile(self, filename):
