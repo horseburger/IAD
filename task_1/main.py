@@ -1,7 +1,7 @@
 import sys
 from neuron import Neuron
-
-
+import numpy as np
+import matplotlib.pyplot as plt
 
 x = Neuron(sys.argv[1], sys.argv[2], 2)
 print(x.w1, x.w2)
@@ -12,15 +12,16 @@ y.w2 = x.w2
 y.bias = False
 b = y.run()
 
-with open('first.txt', 'w') as f:
-    for x in a[2]:
-        f.write("%s\n" % x)
-    f.write("#############\n")
-    for x in a[3]:
-        f.write("%s\n" % x)
-with open('second.txt', 'w') as f:
-    for x in b[2]:
-        f.write("%s\n" % x)
-    f.write("#############\n")
-    for x in b[3]:
-        f.write("%s\n" % x)
+t = []
+
+for i in range(len(a[2])):
+    t.append(i)
+
+plt.clf()
+plt.plot(t, a[2], 'o')
+plt.plot(t, a[3], 'ro')
+plt.savefig('first')
+plt.clf()
+plt.plot(t, b[2], 'o')
+plt.plot(t, b[3], 'ro')
+plt.savefig('second')
