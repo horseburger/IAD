@@ -109,8 +109,8 @@ class Neuron:
 
                     for k in range(len(a1)):
                         y1.append(self.sigmoid(a1[k]))
-                    res_y1.append(y1[0])
-                    res_y2.append(y1[1])
+                    res_y1.append((y1[0], self.x[i]))
+                    res_y2.append((y1[1], self.x[i]))
 
                     for k in range(len(self.w2)):
                         a2.append(self.calcA(y1, self.w2[k]))
@@ -122,6 +122,17 @@ class Neuron:
 
                     error.append(self.cost(result[-1], self.x[i]))
                     print(error[-1])
+
+
+                    # for k in error[-1]:
+                    #     if k < self.eps:
+                    #        flag = True
+                    #        break
+                    if np.all(error[-1]) < self.eps:
+                        flag = True
+                        break
+                    if flag:
+                        break 
 
                     for k in range(len(a2)):
                         b2.append(self.highB(a2[k], self.x[i][k]))
@@ -247,23 +258,7 @@ class Neuron:
 
                     
 
-                    # if j > 100:
-                    #     for k in prevw2:
-                    #         if np.all(np.abs(k)) < self.eps:
-                    #             flag = True
-                    #             print(j)
-                    #             break
-                    #     for k in prevw1:
-                    #         for l in range(1, len(k)):
-                    #             if abs(k[l]) < self.eps and k[l] != 0:
-                    #                 flag = True
-                    #                 print(j)
-                    #                 break
-                    #         if flag:
-                    #             break
-
-                    # if flag:
-                    #     break
+                    
 
                 if flag:
                     break
@@ -276,8 +271,8 @@ class Neuron:
         for z in result:
             print(z)
         
-            
-        self.saveErrorPlot("error.png", error)
+        filename = "error" + str(self.bias)
+        self.saveErrorPlot(filename, error)
         return self.w1, self.w2, res_y1, res_y2
 
 
@@ -299,6 +294,7 @@ class Neuron:
 
     def saveErrorPlot(self, filename, error):
 
+        plt.clf()
 
         x = []
         e1 = []
