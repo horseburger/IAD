@@ -11,7 +11,7 @@ class Neuron:
         self.x = self.inFile(filename)
         # self.y = self.x
         self.it = int(it)
-        self.momentum = 0.2
+        self.momentum = 0
         self.bias = True
         self.eps = 0.0001
         self.number = int(n)
@@ -109,8 +109,8 @@ class Neuron:
 
                     for k in range(len(a1)):
                         y1.append(self.sigmoid(a1[k]))
-                    res_y1.append((y1[0], self.x[i]))
-                    res_y2.append((y1[1], self.x[i]))
+                    res_y1.append(y1[0])
+                    res_y2.append(y1[1])
 
                     for k in range(len(self.w2)):
                         a2.append(self.calcA(y1, self.w2[k]))
@@ -124,16 +124,6 @@ class Neuron:
                     print(error[-1])
 
 
-                    # for k in error[-1]:
-                    #     if k < self.eps:
-                    #        flag = True
-                    #        break
-                    if np.all(error[-1]) < self.eps:
-                        flag = True
-                        break
-                    if flag:
-                        break 
-
                     for k in range(len(a2)):
                         b2.append(self.highB(a2[k], self.x[i][k]))
 
@@ -142,6 +132,7 @@ class Neuron:
                     for k in range(len(y1)):
                         c.append(self.calcError(b2[0], y1[k]))
                         
+                    
                         
                     if i != 0:
                         for k in range(len(c)):
@@ -244,6 +235,8 @@ class Neuron:
                         c.append(self.calcError(b1[k], self.x[i][2]))
                         c.append(self.calcError(b1[k], self.x[i][3]))
 
+                        
+
                         if i != 0:
                             prevw1[k] = [c[q] * self.alpha  + m1[k][q] for q in range(len(c))]
                         else:
@@ -258,9 +251,10 @@ class Neuron:
 
                     
 
-                    
+                    if flag and len(result) == 4:
+                        break
 
-                if flag:
+                if flag and len(result) == 4:
                     break
                 
                 shuffle(self.x)
