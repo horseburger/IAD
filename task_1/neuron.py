@@ -13,8 +13,9 @@ class Neuron:
         self.it = int(it)
         self.momentum = 0
         self.bias = True
-        self.eps = 0.0001
+        self.eps = 0.001
         self.number = int(n)
+        self.stop = False
 
         self.w1 = np.array([[random(), random(), random(), random(), random()]])
         for i in range(self.number - 1):
@@ -29,11 +30,11 @@ class Neuron:
     
 
     def cost(self, result, y):
-        final = []
+        final = 0
         for i in range(len(result)):
-            final.append(((result[i] - y[i])**2) / 2)
+            final += (result[i] - y[i])**2
 
-        return final
+        return final / 2
 
     def calcError(self, b, x):
         return b * x
@@ -123,6 +124,9 @@ class Neuron:
                     error.append(self.cost(result[-1], self.x[i]))
                     print(error[-1])
 
+                    if self.stop:
+                        if error < self.eps:
+                            return j
 
                     for k in range(len(a2)):
                         b2.append(self.highB(a2[k], self.x[i][k]))
@@ -291,42 +295,27 @@ class Neuron:
         plt.clf()
 
         x = []
-        e1 = []
-        e2 = []
-        e3 = []
-        e4 = []
         for i in range(len(error)):
             x.append(i)
-            e1.append(error[i][0])
-            e2.append(error[i][1])
-            e3.append(error[i][2])
-            e4.append(error[i][3])
         
         m = 0
-        for i in error:
-            for j in i:
-                if j > m:
-                    m = j
+        for j in error:
+            if j > m:
+                m = j
         
 
         plt.axis([0, len(error), 0, m])
         if self.number == 1:
-            plt.plot(x, e1, 'r', label="1 neuron w warstwie ukrytej")
-            plt.plot(x, e2, 'r')
-            plt.plot(x, e3, 'r')
-            plt.plot(x, e4, 'r')
+            plt.plot(x, error, 'r', label="1 neuron w warstwie ukrytej")
+
         else: 
             if self.number == 2:
-                plt.plot(x, e1, 'g', label="2 neurony w warstwie ukrytej")
-                plt.plot(x, e2, 'g')
-                plt.plot(x, e3, 'g')
-                plt.plot(x, e4, 'g')
+                plt.scatter(x, error, s=2, label="2 neurony w warstwie ukrytej")
+
             else:
                 if self.number > 2:
-                    plt.plot(x, e1, 'b', label="3 neurony w warstwie ukrytej")
-                    plt.plot(x, e2, 'b')
-                    plt.plot(x, e3, 'b')
-                    plt.plot(x, e4, 'b')
+                    plt.plot(x, error, 'b', label="3 neurony w warstwie ukrytej")
+
         plt.ylabel("Wartosc bledu")
         plt.xlabel("Ilosc iteracji")
         plt.title("Wykres zaleznosci wartosci bledu od ilosci iteracji")
