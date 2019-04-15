@@ -34,7 +34,7 @@ class Neuron:
         for i in range(len(result)):
             final += (result[i] - y[i])**2
 
-        return final / self.number
+        return final / 2
 
     def calcError(self, b, x):
         return b * x
@@ -110,8 +110,6 @@ class Neuron:
 
                     for k in range(len(a1)):
                         y1.append(self.sigmoid(a1[k]))
-                    # res_y1.append(y1[0])
-                    # res_y2.append(y1[1])
 
                     for k in range(len(self.w2)):
                         a2.append(self.calcA(y1, self.w2[k]))
@@ -126,7 +124,7 @@ class Neuron:
 
                     if self.stop:
                         if error[-1] < self.eps:
-                            return j
+                            return j, error[-1]
 
                     for k in range(len(a2)):
                         b2.append(self.highB(a2[k], self.x[i][k]))
@@ -255,11 +253,6 @@ class Neuron:
 
                     
 
-                    if flag and len(result) == 4:
-                        break
-
-                if flag and len(result) == 4:
-                    break
                 
                 shuffle(self.x)
         except KeyboardInterrupt:
@@ -271,7 +264,7 @@ class Neuron:
         
         filename = "error" + str(self.bias)
         self.saveErrorPlot(filename, error)
-        return self.w1, self.w2 #, res_y1, res_y2
+        # return self.w1, self.w2
 
 
     def inFile(self, filename):

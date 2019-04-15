@@ -2,62 +2,109 @@ import sys
 from neuron import Neuron
 import numpy as np
 import matplotlib.pyplot as plt
-from random import random
 
 
 
-x = Neuron(sys.argv[1], sys.argv[2], 3)
-y = Neuron(sys.argv[1], sys.argv[2], 2)
-z = Neuron(sys.argv[1], sys.argv[2], 1)
 
-x.run()
-y.run()
-z.run()
+# 0.1 0.1
+# 0.5 0.5 
+# 0.9 0.9
 
-# y = Neuron(sys.argv[1], sys.argv[2], 2)
-# y.w1 = x.w1
-# y.w2 = x.w2
-# y.bias = False
-# a = x.run()
-# b = y.run()
-# print(x.run())
+def stdDeviation(mean, x):
+    sum = 0
+    for i in x:
+        sum += (i - mean)**2
 
-#pod drugie
-# epoch = []
-# x.stop = True
-# x.bias = True
-# for i in range(1):
-#     x.alpha = random()
-#     x.momentum = random()
-#     j = x.run()
-#     if j != tuple:
-#         epoch.append((j * 4, x.alpha, x.momentum))
-#     else:
-#         epoch.append(sys.argv[2] * 4)
+    return sum / (len(x) - 1)
 
-# print(epoch)
+err = []
+epoch = []
+for i in range(100):
+    x = Neuron(sys.argv[1], 1000000, 2)
+    x.stop = True
+    x.alpha = 0.9
+    x.momentum = 0.9
+    a = x.run()
+    err.append(a[1])
+    epoch.append(a[0])
 
-# with open('bias', 'w') as f:
-#     for i in a[2]:
-#         f.write("%s\n" % i)
-#     f.write("################\n")
-#     for i in a[3]:
-#         f.write("%s\n" % i)
-# with open('no_bias', 'w') as f:
-#     for i in b[2]:
-#         f.write("%s\n" % i)
-#     f.write("################\n")
-#     for i in b[3]:
-#         f.write("%s\n" % i)
+avgErr = sum(err) / len(err)
+avgEpoch = sum(epoch) / len(epoch)
+print("Error avg: %s" % avgErr)
+print("Epoch avg: %s" % avgEpoch)
+stdDev = stdDeviation(avgErr, err)
+with open("third", 'a+') as f:
+    f.write("Alpha = %s\n" % x.alpha)
+    f.write("Momentum = %s\n" % x.momentum)
+    f.write("Average error = %s\n" % avgErr)
+    f.write("Average epoch = %s\n" % avgEpoch)
+    f.write("Standard deviation = %s\n" % stdDev)
 
-# ta = [i for i in range(len(a[2]))]
-# tb = [i for i in range(len(b[2]))]
+        
+err = []
+epoch = []
+for i in range(100):
+    x = Neuron(sys.argv[1], 1000000, 2)
+    x.stop = True
+    x.alpha = 0.1
+    x.momentum = 0.1
+    a = x.run()
+    err.append(a[1])
+    epoch.append(a[0])
 
-# plt.clf()
-# plt.plot(ta, a[2], 'o')
-# plt.plot(ta, a[3], 'ro')
-# plt.savefig('first')
-# plt.clf()
-# plt.plot(tb, b[2], 'o')
-# plt.plot(tb, b[3], 'ro')
-# plt.savefig('second')
+avgErr = sum(err) / len(err)
+avgEpoch = sum(epoch) / len(epoch)
+print("Error avg: %s" % avgErr)
+print("Epoch avg: %s" % avgEpoch)
+stdDev = stdDeviation(avgErr, err)
+with open("third", 'a+') as f:
+    f.write("Alpha = %s\n" % x.alpha)
+    f.write("Momentum = %s\n" % x.momentum)
+    f.write("Average error = %s\n" % avgErr)
+    f.write("Average epoch = %s\n" % avgEpoch)
+    f.write("Standard deviation = %s\n" % stdDev)
+
+err = []
+epoch = []
+for i in range(100):
+    x = Neuron(sys.argv[1], 1000000, 2)
+    x.stop = True
+    x.alpha = 0.5
+    x.momentum = 0.5
+    a = x.run()
+    err.append(a[1])
+    epoch.append(a[0])
+
+avgErr = sum(err) / len(err)
+avgEpoch = sum(epoch) / len(epoch)
+stdDev = stdDeviation(avgErr, err)
+with open("third", 'a+') as f:
+    f.write("Alpha = %s\n" % x.alpha)
+    f.write("Momentum = %s\n" % x.momentum)
+    f.write("Average error = %s\n" % avgErr)
+    f.write("Average epoch = %s\n" % avgEpoch)
+    f.write("Standard deviation = %s\n" % stdDev)
+
+
+err = []
+epoch = []
+for i in range(100):
+    x = Neuron(sys.argv[1], 1000000, 2)
+    x.stop = True
+    x.alpha = 0.2
+    x.momentum = 0.5
+    a = x.run()
+    err.append(a[1])
+    epoch.append(a[0])
+
+avgErr = sum(err) / len(err)
+avgEpoch = sum(epoch) / len(epoch)
+print("Error avg: %s" % avgErr)
+print("Epoch avg: %s" % avgEpoch)
+stdDev = stdDeviation(avgErr, err)
+with open("third", 'a+') as f:
+    f.write("Alpha = %s\n" % x.alpha)
+    f.write("Momentum = %s\n" % x.momentum)
+    f.write("Average error = %s\n" % avgErr)
+    f.write("Average epoch = %s\n" % avgEpoch)
+    f.write("Standard deviation = %s\n" % stdDev)
