@@ -11,7 +11,7 @@ class Neuron:
         self.x = self.inFile(filename)
         # self.y = self.x
         self.it = int(it)
-        self.momentum = 0
+        self.momentum = 0.2
         self.bias = True
         self.eps = 0.001
         self.number = int(n)
@@ -34,7 +34,7 @@ class Neuron:
         for i in range(len(result)):
             final += (result[i] - y[i])**2
 
-        return final / 2
+        return final / self.number
 
     def calcError(self, b, x):
         return b * x
@@ -110,8 +110,8 @@ class Neuron:
 
                     for k in range(len(a1)):
                         y1.append(self.sigmoid(a1[k]))
-                    res_y1.append(y1[0])
-                    res_y2.append(y1[1])
+                    # res_y1.append(y1[0])
+                    # res_y2.append(y1[1])
 
                     for k in range(len(self.w2)):
                         a2.append(self.calcA(y1, self.w2[k]))
@@ -125,7 +125,7 @@ class Neuron:
                     print(error[-1])
 
                     if self.stop:
-                        if error < self.eps:
+                        if error[-1] < self.eps:
                             return j
 
                     for k in range(len(a2)):
@@ -271,7 +271,7 @@ class Neuron:
         
         filename = "error" + str(self.bias)
         self.saveErrorPlot(filename, error)
-        return self.w1, self.w2, res_y1, res_y2
+        return self.w1, self.w2 #, res_y1, res_y2
 
 
     def inFile(self, filename):
@@ -292,7 +292,7 @@ class Neuron:
 
     def saveErrorPlot(self, filename, error):
 
-        plt.clf()
+        # plt.clf()
 
         x = []
         for i in range(len(error)):
@@ -306,15 +306,15 @@ class Neuron:
 
         plt.axis([0, len(error), 0, m])
         if self.number == 1:
-            plt.plot(x, error, 'r', label="1 neuron w warstwie ukrytej")
+            plt.scatter(x, error, s=2, label="1 neuron w warstwie ukrytej")
 
         else: 
             if self.number == 2:
                 plt.scatter(x, error, s=2, label="2 neurony w warstwie ukrytej")
 
             else:
-                if self.number > 2:
-                    plt.plot(x, error, 'b', label="3 neurony w warstwie ukrytej")
+                if self.number == 3:
+                    plt.scatter(x, error, s=2, label="3 neurony w warstwie ukrytej")
 
         plt.ylabel("Wartosc bledu")
         plt.xlabel("Ilosc iteracji")

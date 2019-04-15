@@ -2,21 +2,40 @@ import sys
 from neuron import Neuron
 import numpy as np
 import matplotlib.pyplot as plt
+from random import random
 
-x = Neuron(sys.argv[1], sys.argv[2], 2)
+
+
+x = Neuron(sys.argv[1], sys.argv[2], 3)
 y = Neuron(sys.argv[1], sys.argv[2], 2)
-y.w1 = x.w1
-y.w2 = x.w2
-y.bias = False
+z = Neuron(sys.argv[1], sys.argv[2], 1)
+
+x.run()
+y.run()
+z.run()
+
+# y = Neuron(sys.argv[1], sys.argv[2], 2)
+# y.w1 = x.w1
+# y.w2 = x.w2
+# y.bias = False
 # a = x.run()
 # b = y.run()
-x.stop = True
 # print(x.run())
-j = x.run()
-if type(j) != list:
-    print(j)
 
+#pod drugie
+# epoch = []
+# x.stop = True
+# x.bias = True
+# for i in range(1):
+#     x.alpha = random()
+#     x.momentum = random()
+#     j = x.run()
+#     if j != tuple:
+#         epoch.append((j * 4, x.alpha, x.momentum))
+#     else:
+#         epoch.append(sys.argv[2] * 4)
 
+# print(epoch)
 
 # with open('bias', 'w') as f:
 #     for i in a[2]:
