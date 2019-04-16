@@ -13,7 +13,7 @@ class Neuron:
         self.it = int(it)
         self.momentum = 0.1
         self.bias = True
-        self.eps = 0.001
+        self.eps = 0.0001
         self.number = int(n)
         self.stop = False
 
@@ -79,8 +79,8 @@ class Neuron:
         flag = False
         prevw2 = [0, 0, 0, 0]
         prevw1 = [0 for i in range(self.number)]
-        res_y1 = []
-        res_y2 = []
+        res_y1 = [0, 0, 0, 0]
+        res_y2 = [0, 0, 0, 0]
         finalErr = []
         try:
             for j in range(self.it):
@@ -119,6 +119,10 @@ class Neuron:
                         y2.append(self.sigmoid(a2[k]))
 
                     result.append(y2)
+                    
+                    res_y1[i] = [y1[0], self.x[i]]
+                    res_y2[i] = [y1[1], self.x[i]]
+
 
                     error.append(self.cost(result[-1], self.x[i]))
 
@@ -264,9 +268,11 @@ class Neuron:
         print("\nRESULTS:\n")
         for z in result:
             print(z)
+
+        return res_y1, res_y2
         
-        filename = "error" + str(self.bias)
-        self.saveErrorPlot(filename, finalErr)
+        #filename = "error" + str(self.bias)
+        #self.saveErrorPlot(filename, finalErr)
         # return self.w1, self.w2
 
 
