@@ -11,7 +11,7 @@ class Neuron:
         self.x = self.inFile(filename)
         # self.y = self.x
         self.it = int(it)
-        self.momentum = 0.2
+        self.momentum = 0.1
         self.bias = True
         self.eps = 0.001
         self.number = int(n)
@@ -75,19 +75,20 @@ class Neuron:
         return self.findParams(self.number)
 
     def findParams(self, n):
-        error = []
         oneVec = [1 for i in range(len(self.x))]
         flag = False
         prevw2 = [0, 0, 0, 0]
         prevw1 = [0 for i in range(self.number)]
         res_y1 = []
         res_y2 = []
+        finalErr = []
         try:
             for j in range(self.it):
                 
 
 
                 result = []
+                error = []
 
 
                 for i in range(len(self.x)):
@@ -120,11 +121,8 @@ class Neuron:
                     result.append(y2)
 
                     error.append(self.cost(result[-1], self.x[i]))
-                    print(error[-1])
 
-                    if self.stop:
-                        if error[-1] < self.eps:
-                            return j, error[-1]
+                    
 
                     for k in range(len(a2)):
                         b2.append(self.highB(a2[k], self.x[i][k]))
@@ -253,7 +251,12 @@ class Neuron:
 
                     
 
-                
+                finalErr.append(sum(error) / 4)
+                print(finalErr[-1])
+                if self.stop:
+                    if finalErr[-1] < self.eps:
+                        flag = True
+                        return j, finalErr[-1]
                 shuffle(self.x)
         except KeyboardInterrupt:
             pass
@@ -263,7 +266,7 @@ class Neuron:
             print(z)
         
         filename = "error" + str(self.bias)
-        self.saveErrorPlot(filename, error)
+        self.saveErrorPlot(filename, finalErr)
         # return self.w1, self.w2
 
 
@@ -291,23 +294,19 @@ class Neuron:
         for i in range(len(error)):
             x.append(i)
         
-        m = 0
-        for j in error:
-            if j > m:
-                m = j
         
 
-        plt.axis([0, len(error), 0, m])
+        plt.axis([0, len(error), 0, 0.5])
         if self.number == 1:
-            plt.scatter(x, error, s=2, label="1 neuron w warstwie ukrytej")
+            plt.plot(x, error, 'r', label="1 neuron w warstwie ukrytej")
 
         else: 
             if self.number == 2:
-                plt.scatter(x, error, s=2, label="2 neurony w warstwie ukrytej")
+                plt.plot(x, error, label="2 neurony w warstwie ukrytej")
 
             else:
                 if self.number == 3:
-                    plt.scatter(x, error, s=2, label="3 neurony w warstwie ukrytej")
+                    plt.plot(x, error, 'g', label="3 neurony w warstwie ukrytej")
 
         plt.ylabel("Wartosc bledu")
         plt.xlabel("Ilosc iteracji")
