@@ -2,23 +2,33 @@ import sys
 from neuron import Neuron
 import numpy as np
 import matplotlib.pyplot as plt
+from math import sqrt
 
+# part 1
 
-
-
-
+x = Neuron(sys.argv[1], sys.argv[2], 1)
+x.run()
 x = Neuron(sys.argv[1], sys.argv[2], 2)
-y = Neuron(sys.argv[1], sys.argv[2], 2)
-y.w1 = x.w1
-y.w2 = x.w2
-x.stop = True
-y.stop = True
-y.bias = False
-bias = x.run()
-no_bias = y.run()
+x.run()
+x = Neuron(sys.argv[1], sys.argv[2], 2)
+x.run()
 
-print(bias)
-print(no_bias)
+# part 2
+
+# x = Neuron(sys.argv[1], sys.argv[2], 2)
+# y = Neuron(sys.argv[1], sys.argv[2], 2)
+# y.w1 = x.w1
+# y.w2 = x.w2
+# x.stop = True
+# y.stop = True
+# y.bias = False
+# bias = x.run()
+# no_bias = y.run()
+
+# print(bias)
+# print(no_bias)
+
+# part 3
 
 # 0.1 0.1
 # 0.5 0.5 
@@ -47,7 +57,7 @@ print(no_bias)
 # avgEpoch = sum(epoch) / len(epoch)
 # print("Error avg: %s" % avgErr)
 # print("Epoch avg: %s" % avgEpoch)
-# stdDev = stdDeviation(avgErr, err)
+# stdDev = sqrt(stdDeviation(avgEpoch, epoch))
 # with open("third", 'a+') as f:
 #    f.write("Alpha = %s\n" % x.alpha)
 #    f.write("Momentum = %s\n" % x.momentum)
@@ -71,7 +81,7 @@ print(no_bias)
 # avgEpoch = sum(epoch) / len(epoch)
 # print("Error avg: %s" % avgErr)
 # print("Epoch avg: %s" % avgEpoch)
-# stdDev = stdDeviation(avgErr, err)
+# stdDev = sqrt(stdDeviation(avgEpoch, epoch))
 # with open("third", 'a+') as f:
 #    f.write("Alpha = %s\n" % x.alpha)
 #    f.write("Momentum = %s\n" % x.momentum)
@@ -92,7 +102,7 @@ print(no_bias)
 
 # avgErr = sum(err) / len(err)
 # avgEpoch = sum(epoch) / len(epoch)
-# stdDev = stdDeviation(avgErr, err)
+# stdDev = sqrt(stdDeviation(avgEpoch, epoch))
 # with open("third", 'a+') as f:
 #    f.write("Alpha = %s\n" % x.alpha)
 #    f.write("Momentum = %s\n" % x.momentum)
@@ -116,7 +126,7 @@ print(no_bias)
 # avgEpoch = sum(epoch) / len(epoch)
 # print("Error avg: %s" % avgErr)
 # print("Epoch avg: %s" % avgEpoch)
-# stdDev = stdDeviation(avgErr, err)
+# stdDev = sqrt(stdDeviation(avgEpoch, epoch))
 # with open("third", 'a+') as f:
 #    f.write("Alpha = %s\n" % x.alpha)
 #    f.write("Momentum = %s\n" % x.momentum)

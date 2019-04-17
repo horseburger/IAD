@@ -9,13 +9,12 @@ class Neuron:
     def __init__(self, filename, it, n):
         self.alpha = 0.1
         self.x = self.inFile(filename)
-        # self.y = self.x
         self.it = int(it)
         self.momentum = 0.1
-        self.bias = True
-        self.eps = 0.0001
+        self.eps = 0.001
         self.number = int(n)
         self.stop = False
+        self.bias = True
 
         self.w1 = np.array([[random(), random(), random(), random(), random()]])
         for i in range(self.number - 1):
@@ -271,9 +270,9 @@ class Neuron:
 
         return res_y1, res_y2
         
-        #filename = "error" + str(self.bias)
-        #self.saveErrorPlot(filename, finalErr)
-        # return self.w1, self.w2
+        filename = "error" + str(self.bias)
+        self.saveErrorPlot(filename, finalErr)
+        return self.w1, self.w2
 
 
     def inFile(self, filename):
