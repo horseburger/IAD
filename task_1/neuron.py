@@ -268,10 +268,11 @@ class Neuron:
         for z in result:
             print(z)
 
-        if self.number == 2: return res_y1, res_y2
-        
         filename = "error" + str(self.bias)
         self.saveErrorPlot(filename, finalErr)
+
+        if self.number == 2: return res_y1, res_y2
+        
         return self.w1, self.w2
 
 
