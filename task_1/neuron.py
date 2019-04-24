@@ -74,7 +74,6 @@ class Neuron:
         return self.findParams(self.number)
 
     def findParams(self, n):
-        oneVec = [1 for i in range(len(self.x))]
         flag = False
         prevw2 = [0, 0, 0, 0]
         prevw1 = [0 for i in range(self.number)]
@@ -119,8 +118,9 @@ class Neuron:
 
                     result.append(y2)
                     
-                    res_y1[i] = [y1[0], self.x[i]]
-                    res_y2[i] = [y1[1], self.x[i]]
+                    if self.number == 2:
+                        res_y1[i] = [y1[0], self.x[i]]
+                        res_y2[i] = [y1[1], self.x[i]]
 
 
                     error.append(self.cost(result[-1], self.x[i]))
@@ -268,7 +268,7 @@ class Neuron:
         for z in result:
             print(z)
 
-        return res_y1, res_y2
+        if self.number == 2: return res_y1, res_y2
         
         filename = "error" + str(self.bias)
         self.saveErrorPlot(filename, finalErr)
