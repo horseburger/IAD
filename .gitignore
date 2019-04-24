@@ -1,3 +1,5 @@
 *.png
 .vscode
 __*
+*.txt
+*.zip
