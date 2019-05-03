@@ -6,11 +6,14 @@ from time import sleep
 import math
 import os
 
+if len(sys.argv) < 3:
+    print("Usage main.py <no. of centroids> <iterations> <epsilon>")
+    sys.exit()
+
 k = int(sys.argv[1])
 epoch = int(sys.argv[2])
 eps = float(sys.argv[3])
-
-
+filenameIter = 0
 
 def dist(a, b):
     return math.sqrt((b[0] - a[0])**2 + (b[1] - a[1])**2)
@@ -27,14 +30,21 @@ def minInList(list):
             j = i
     return j
 
-def generateCenters():
+def generateCentroids():
     c = []
     for i in range(k):
         c.append([random.uniform(-10,10), random.uniform(-10, 10)])
         random.seed(random.random())
     return c
 
-def moveCenter(X):
+def correctCentroids(c, empty):
+    for i in empty:
+        c[i] = [random.uniform(-10, 10), random.uniform(-10, 10)]
+        random.seed(random.random())
+    return c
+
+
+def moveCentroid(X):
     sumX = 0
     sumY = 0
     for i in X:
@@ -57,19 +67,22 @@ def assignPoints(points, c):
     return X, error
 
 def drawGraph(X, c):
-    for i in X:
-        plt.scatter([j[0] for j in i], [j[1] for j in i], s=2, c=np.random.rand(3))
+    plt.clf()
 
-    C1 = plt.Circle((-3,0), radius= 2, fill=0)
-    C2 = plt.Circle((3, 0), radius=2, fill=0)
-    plt.scatter([i[0] for i in c], [i[1] for i in c], s=4, c='r')
-    # plt.scatter([i[0] for i in points], [i[1] for i in points], s=2)
-    ax=plt.gca()
-    ax.add_patch(C1)
-    ax.add_patch(C2)
+    # C1 = plt.Circle((-3,0), radius= 2, fill=0)
+    # C2 = plt.Circle((3, 0), radius=2, fill=0)
+    plt.scatter([i[0] for i in points], [i[1] for i in points], s=2, c='k')
+    plt.scatter([i[0] for i in c], [i[1] for i in c], s=6, c='r')
+    # ax=plt.gca()
+    # ax.add_patch(C1)
+    # ax.add_patch(C2)
     plt.axis([-10.1, 10.1, -10.1, 10.1])
     plt.grid()
-    plt.show()
+    global filenameIter 
+    plt.savefig("plot" + str(k) + "_" + str(filenameIter))
+    filenameIter += 1
+    # plt.show()``
+
 
 c1 = [-3, 0]
 c2 = [3, 0]
@@ -86,35 +99,46 @@ while len(points) != 200:
         points.append(tmp)
 
 random.shuffle(points)
-c = generateCenters()
+c = generateCentroids()
 
 
 while True:
-    c = generateCenters()
     flag = False
 
     X, error = assignPoints(points, c)
-    
-    for i in X:
-        if not i:
+    empty = []
+
+    for i in range(len(X)):
+        if not X[i]:
+            empty.append(i)
             flag = True
             break
     if not flag:
         break
-prevError = calcError(error)
-print(prevError)
+    c = correctCentroids(c, empty)
 
+        
+prevError = calcError(error)
+finalErr = [prevError]
+print(prevError)
 drawGraph(X, c)
 
 
 for i in range(epoch):
     for j in range(len(c)):
-        c[j] = moveCenter(X[j])
+        c[j] = moveCentroid(X[j])
 
     X, error = assignPoints(points, c)
     newError = calcError(error)
+    finalErr.append(newError)
     if abs(newError - prevError) < eps:
         break
     prevError = newError
     drawGraph(X, c)
     print(newError)
+
+plt.clf()
+plt.axis([0, len(finalErr), min(finalErr) - 0.1, max(finalErr) + 0.1])
+plt.grid()
+plt.plot([i for i in range(len(finalErr))], finalErr)
+plt.savefig("error" + str(k))
