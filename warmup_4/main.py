@@ -6,14 +6,17 @@ from time import sleep
 import math
 import os
 
+k = int(sys.argv[1])
+epoch = int(sys.argv[2])
+eps = float(sys.argv[3])
+
+
+
 def dist(a, b):
     return math.sqrt((b[0] - a[0])**2 + (b[1] - a[1])**2)
 
-# def error(a, b):
-#     sum = 0 
-#     for i in range(len(a)):
-#         sum += dist(a[i], b[i])
-#     return sum / len(a)
+def calcError(error):
+    return sum(error) / len(error)
 
 def minInList(list):
     m = list[0]
@@ -24,58 +27,94 @@ def minInList(list):
             j = i
     return j
 
-p1 = []
-p2 = []
+def generateCenters():
+    c = []
+    for i in range(k):
+        c.append([random.uniform(-10,10), random.uniform(-10, 10)])
+        random.seed(random.random())
+    return c
+
+def moveCenter(X):
+    sumX = 0
+    sumY = 0
+    for i in X:
+        sumX += i[0]
+        sumY += i[1]
+    newC = [sumX / len(X), sumY / len(X)]
+    return newC
+
+def assignPoints(points, c):
+    X = [[] for i in range(k)]
+    error = []
+    for i in range(len(points)):
+        l = []
+        for j in range(len(c)):
+            l.append(dist(points[i], c[j]))
+        r = minInList(l)
+        X[r].append(points[i])
+        error.append(dist(X[r][-1], c[r]))
+
+    return X, error
+
+def drawGraph(X, c):
+    for i in X:
+        plt.scatter([j[0] for j in i], [j[1] for j in i], s=2, c=np.random.rand(3))
+
+    C1 = plt.Circle((-3,0), radius= 2, fill=0)
+    C2 = plt.Circle((3, 0), radius=2, fill=0)
+    plt.scatter([i[0] for i in c], [i[1] for i in c], s=4, c='r')
+    # plt.scatter([i[0] for i in points], [i[1] for i in points], s=2)
+    ax=plt.gca()
+    ax.add_patch(C1)
+    ax.add_patch(C2)
+    plt.axis([-10.1, 10.1, -10.1, 10.1])
+    plt.grid()
+    plt.show()
+
 c1 = [-3, 0]
 c2 = [3, 0]
+points = []
 
-while len(p1) != 100:
+while len(points) != 100:
     tmp = [random.uniform(-5, -1), random.uniform(-2, 2)]
-    if dist(tmp, [-3, 0]) < 2:
-        p1.append(tmp)
+    if dist(tmp, c1) < 2:
+        points.append(tmp)
 
-while len(p2) != 100:
+while len(points) != 200:
     tmp = [random.uniform(1, 5), random.uniform(-2, 2)]
-    if dist(tmp, [3, 0]) < 2:
-        p2.append(tmp)
+    if dist(tmp, c2) < 2:
+        points.append(tmp)
 
-k = int(sys.argv[1])
-r = []
-for i in range(k):
-    r.append([random.uniform(-8, 8), random.uniform(-8, 8)])
-    random.seed(random.random())
+random.shuffle(points)
+c = generateCenters()
 
 
-X = [[] for i in range(k)]
+while True:
+    c = generateCenters()
+    flag = False
 
-error = []
+    X, error = assignPoints(points, c)
+    
+    for i in X:
+        if not i:
+            flag = True
+            break
+    if not flag:
+        break
+prevError = calcError(error)
+print(prevError)
 
-for i in range(len(p1)):
-    l1 = []
-    l2 = []
-    for j in range(len(r)):
-        l1.append(dist(p1[i], r[j]))        
-        l2.append(dist(p2[i], r[j]))
-        error.append(l1[-1])
-        error.append(l2[-1])
-    X[minInList(l1)].append(p1[i])
-    X[minInList(l2)].append(p2[i])
-
-c1 = plt.Circle((-3,0), radius= 2, fill=0)
-c2 = plt.Circle((3, 0), radius=2, fill=0)
-
-print(sum(error) / len(error))
-
-for i in X:
-    plt.scatter([j[0] for j in i], [j[1] for j in i], s=2, c=np.random.rand(3))
+drawGraph(X, c)
 
 
+for i in range(epoch):
+    for j in range(len(c)):
+        c[j] = moveCenter(X[j])
 
-
-plt.scatter([i[0] for i in r], [i[1] for i in r], s=4, c='r')
-ax=plt.gca()
-ax.add_patch(c1)
-ax.add_patch(c2)
-plt.axis([-10, 10, -10, 10])
-plt.grid()
-plt.show()
+    X, error = assignPoints(points, c)
+    newError = calcError(error)
+    if abs(newError - prevError) < eps:
+        break
+    prevError = newError
+    drawGraph(X, c)
+    print(newError)
