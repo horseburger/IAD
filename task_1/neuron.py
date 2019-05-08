@@ -10,7 +10,7 @@ class Neuron:
         self.alpha = 0.1
         self.x = self.inFile(filename)
         self.it = int(it)
-        self.momentum = 0.1
+        self.momentum = 0.0
         self.eps = 0.001
         self.number = int(n)
         self.stop = False

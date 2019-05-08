@@ -66,7 +66,7 @@ def assignPoints(points, c):
 
     return X, error
 
-def drawGraph(X, c):
+def drawGraph(c):
     plt.clf()
 
     # C1 = plt.Circle((-3,0), radius= 2, fill=0)
@@ -121,7 +121,7 @@ while True:
 prevError = calcError(error)
 finalErr = [prevError]
 print(prevError)
-drawGraph(X, c)
+drawGraph(c)
 
 
 for i in range(epoch):
@@ -134,7 +134,7 @@ for i in range(epoch):
     if abs(newError - prevError) < eps:
         break
     prevError = newError
-    drawGraph(X, c)
+    drawGraph(c)
     print(newError)
 
 plt.clf()
