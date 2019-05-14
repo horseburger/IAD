@@ -181,7 +181,7 @@ class Neuron:
                     
                     if i != 0:
                         for k in range(len(c)):
-                            m2.append(self.calcMomentum(self.momentum, prevw2[1][k]))
+                            m2.append(self.calcMomentum(self.momentum, prevw2[2][k]))
 
                     if i != 0:
                         prevw2[2] = [c[q] * self.alpha  + m2[q] for q in range(len(c))]

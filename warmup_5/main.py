@@ -2,12 +2,14 @@ import matplotlib.pyplot as plt
 import random
 import math
 import sys
+import subprocess
+import imageio
 import numpy as np
 
 
 mode = 0 if sys.argv[1] == "WTA" else 1
 eps = 0.001
-l = 0.99
+l = 3.0
 alpha = 0.1
 it = 0
 
@@ -89,8 +91,7 @@ def influence(k, kx):
         return w
     else:
         w = (findRo(k, kx)**2) / (2 * l**2)
-        w = -w
-    return np.exp(w)
+    return np.exp(-w)
 
 points = generatePoints()
 c = generateCentroids()
@@ -99,25 +100,23 @@ prevErr = calculateError(points, c)
 print(prevErr)
 drawGraph(points, c)
 
-for i in range(40):
+for i in range(int(sys.argv[2])):
     for j in range(len(points)):
-        k = findMinK(points[i], c)
+        k = findMinK(points[j], c)
         for q in range(len(c)):
             inf = influence(q, k)
             c[q][0] = c[q][0] + alpha * inf * (points[j][0] - c[q][0])
             c[q][1] = c[q][1] + alpha * inf * (points[j][1] - c[q][1])
-        if j % 10 == 0:
+        if j % 10 == 0 and l > 0.1:
             l -= 0.01
     newErr = calculateError(points, c)
     print(newErr)
-    if abs(prevErr - newErr) < eps:
-        break
     prevErr = newErr
     error.append(prevErr)
-    drawGraph(points, c)
+    if i < 30 or i % 25 == 0: drawGraph(points, c)
     random.shuffle(points)
 
 plt.clf()
-plt.axis([0, len(error), 0, max(error)])
+plt.axis([0, len(error), min(error) - 0.1, max(error) + 0.1])
 plt.plot([i for i in range(len(error))], [i for i in error])
 plt.savefig("error")
