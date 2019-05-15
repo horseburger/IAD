@@ -6,7 +6,6 @@ import subprocess
 import numpy as np
 
 
-eps = 0.001
 l = 2.5
 alpha = 0.1
 it = 0

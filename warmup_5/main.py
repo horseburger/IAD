@@ -74,15 +74,6 @@ def findRo(k, i):
     return abs(k - i)
 
 def influence(k, kx):
-#     w = [0 for i in range(len(c))]
-#     if not mode:
-#         w[k] = 1
-#         return w
-#     for i in range(len(c)):
-#         w[i] =  (findRo(k, i)**2) / (2 * l**2)
-#         w[i] = -w[i]
-
-#     return w
     w = 0
     if not mode:
         if k == kx:
