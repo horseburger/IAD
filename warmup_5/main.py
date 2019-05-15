@@ -12,7 +12,7 @@ eps = 0.001
 l = 3.0
 alpha = 0.1
 it = 0
-
+nCentroids = 10
 def dist(a, b):
     return np.sqrt((b[0] - a[0])**2 + (b[1] - a[1])**2)
 
@@ -35,7 +35,7 @@ def generatePoints():
 
 def generateCentroids():
     c = []
-    for i in range(10):
+    for i in range(nCentroids):
         c.append([random.uniform(-10, 10), random.uniform(-10, 10)])
         random.seed(random.random())
 
@@ -107,8 +107,8 @@ for i in range(int(sys.argv[2])):
             inf = influence(q, k)
             c[q][0] = c[q][0] + alpha * inf * (points[j][0] - c[q][0])
             c[q][1] = c[q][1] + alpha * inf * (points[j][1] - c[q][1])
-        if j % 10 == 0 and l > 0.1:
-            l -= 0.01
+        if j % 10 == 0 and l > 0.01:
+            l -= 0.005
     newErr = calculateError(points, c)
     print(newErr)
     prevErr = newErr
