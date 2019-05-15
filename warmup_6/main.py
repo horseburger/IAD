@@ -6,14 +6,14 @@ import subprocess
 import numpy as np
 
 
-mode = 0 if sys.argv[1] == "WTA" else 1
 eps = 0.001
-l = 3.0
+l = 2.5
 alpha = 0.1
 it = 0
 nCentroids = 10
 def dist(a, b):
     return np.sqrt((b[0] - a[0])**2 + (b[1] - a[1])**2)
+
 
 
 def generatePoints():
@@ -53,6 +53,25 @@ def drawGraph(X, c):
     it += 1
     # plt.show()
 
+def sortC(point, c):
+    d = []
+    for i in range(len(c)):
+        d.append([i, dist(point, c[i])])
+    
+    for i in range(len(c)):
+        for j in range(len(c) - 1):
+            if d[j][1] > d[j + 1][1]:
+                tmp = d[j]
+                d[j] = d[j + 1]
+                d[j + 1] = tmp
+    i = []
+    for j in range(len(d)):
+        i.append(d[j][0])
+
+
+    return i
+
+
 def findMinK(point, c):
     k = dist(point, c[0])
     q = 0
@@ -64,33 +83,16 @@ def findMinK(point, c):
 
     return q
 
+    
+            
 def calculateError(points, c):
     error = []
     for i in range(len(points)):
         error.append(dist(points[i], c[findMinK(points[i], c)]))
     return sum(error) / len(error)
 
-def findRo(k, i):
-    return abs(k - i)
 
-def influence(k, kx):
-#     w = [0 for i in range(len(c))]
-#     if not mode:
-#         w[k] = 1
-#         return w
-#     for i in range(len(c)):
-#         w[i] =  (findRo(k, i)**2) / (2 * l**2)
-#         w[i] = -w[i]
-
-#     return w
-    w = 0
-    if not mode:
-        if k == kx:
-            w = 1
-        return w
-    else:
-        w = (findRo(k, kx)**2) / (2 * l**2)
-    return np.exp(-w)
+# sort by distance to point and 'i' is the distance in the sorted list
 
 points = generatePoints()
 c = generateCentroids()
@@ -99,15 +101,16 @@ prevErr = calculateError(points, c)
 print(prevErr)
 drawGraph(points, c)
 
-for i in range(int(sys.argv[2])):
+for i in range(int(sys.argv[1])):
     for j in range(len(points)):
-        k = findMinK(points[j], c)
-        for q in range(len(c)):
-            inf = influence(q, k)
-            c[q][0] = c[q][0] + alpha * inf * (points[j][0] - c[q][0])
-            c[q][1] = c[q][1] + alpha * inf * (points[j][1] - c[q][1])
-        if j % 10 == 0 and l > 0.5:
-            l -= 0.5
+        # map returns a tuple consisting of (x, y), distance from point to centroid
+        ranking = sorted(map(lambda centroid: (centroid, dist(points[j], centroid)), c), key=lambda k: k[1])
+        ranking = map(lambda k: k[0], ranking)
+        for idx, centroid in enumerate(ranking): 
+            inf = np.exp(-idx / l)
+            centroid[0] = centroid[0] + alpha * inf * (points[j][0] - centroid[0])
+            centroid[1] = centroid[1] + alpha * inf * (points[j][1] - centroid[1])
+    l = max(2.5 - i * 0.5, 0.1)
     newErr = calculateError(points, c)
     print(newErr)
     prevErr = newErr
