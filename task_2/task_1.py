@@ -1,3 +1,4 @@
+#!/usr/bin/python
 import numpy as np
 from Point import Point
 from Centroid import Centroid
@@ -15,18 +16,21 @@ group.add_argument("-c", help="Draw points inside two circles", action="store_tr
 algs.add_argument("-k", help="Use Kohonen's algorithm", action="store_true")
 algs.add_argument("-g",help="Use neural gas", action="store_true")
 parser.add_argument("--wta", help="Use WTA with Kohonen's algorithm (default WTM)", action="store_true")
+parser.add_argument("-e", default=15, help="Number of iterations")
+parser.add_argument("-n", default=10, help="Number of centroids")
+parser.add_argument("-N", default=200, help="Number of points")
 args = parser.parse_args()
 
-if len(sys.argv) == 1:
+if len(sys.argv) < 3:
     parser.print_help()
     sys.exit(1)
 
-# mode = 0
 it = 0
-epochs = 15
+epochs = int(args.e)
 alpha = 0.1
 l = 3.0
-nCentroids = 10
+nCentroids = int(args.n)
+nPoints = int(args.N)
 
 def dist(a, b):
     return np.sqrt((b[0] - a[0])**2 + (b[1] - a[1])**2)
@@ -74,19 +78,18 @@ def drawGraph(points, centroids):
 
 def generatePoints():
     if args.r:
-        # return [Point(random.uniform(-5, -1), random.uniform(-1, 1)) for i in range(200)]
-        points = [Point(random.uniform(-5, -1), random.uniform(-1, 1)) for i in range(100)]
-        for i in range(100):
+        points = [Point(random.uniform(-5, -1), random.uniform(-1, 1)) for i in range(nPoints / 2)]
+        for i in range(nPoints / 2):
             points.append(Point(random.uniform(1, 5), random.uniform(-1, 1)))
         return points
     if args.c:
         points = []
-        while len(points) != 100:
+        while len(points) != nPoints / 2:
             tmp = Point(random.uniform(-5, -1), random.uniform(-2, 2))
             if tmp.dist(Point(-3, 0)) < 2:
                 points.append(tmp)
 
-        while len(points) != 200:
+        while len(points) != nPoints:
             tmp = Point(random.uniform(1, 5), random.uniform(-2, 2))
             if tmp.dist(Point(3, 0)) < 2:
                 points.append(tmp)
@@ -94,7 +97,11 @@ def generatePoints():
         random.shuffle(points)
         return points
     if args.l:
-        return [Point(random.uniform(-7, 7), 2) for i in range(200)]
+        points =  [Point(random.uniform(-7, 7), 2) for i in range(nPoints / 2)]
+        for i in range(nPoints / 2):
+            points.append(Point(random.uniform(-7, 7), -2))
+        return points
+
 
 def generateCentroids():
     return [Centroid(random.uniform(-10, 10), random.uniform(-10, 10)) for i in range(nCentroids)]
@@ -113,6 +120,12 @@ for i in range(epochs):
             for q in range(len(centroids)):
                 inf = influenceKohonen(q, k)
                 centroids[q].updateCentroid(alpha, inf, points[j])
+        if args.g:
+            ranking = sorted(map(lambda centroid: (centroid, points[j].dist(centroid)), centroids), key=lambda k: k[1])
+            ranking = map(lambda k: k[0], ranking)
+            for idx, centroid in enumerate(ranking):
+                inf = np.exp(-idx / l)
+                centroid.updateCentroid(alpha, inf, points[j])
     l = max(3.0 - i * 0.5, 0.1)
     newErr = calculateError(points, centroids)
     print(newErr)
