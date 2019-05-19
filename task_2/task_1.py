@@ -12,16 +12,17 @@ group = parser.add_mutually_exclusive_group()
 algs = parser.add_mutually_exclusive_group()
 group.add_argument("-r", help="Draw points inside two rectangles", action="store_true")
 group.add_argument("-l", help="Draw points in a line", action="store_true")
-group.add_argument("-c", help="Draw points inside two circles", action="store_true")
+group.add_argument("-c", help="Draw points inside two circles", action="store_true", default=True)
 algs.add_argument("-k", help="Use Kohonen's algorithm", action="store_true")
 algs.add_argument("-g",help="Use neural gas", action="store_true")
 parser.add_argument("--wta", help="Use WTA with Kohonen's algorithm (default WTM)", action="store_true")
 parser.add_argument("-e", default=15, help="Number of iterations")
 parser.add_argument("-n", default=10, help="Number of centroids")
 parser.add_argument("-N", default=200, help="Number of points")
+parser.add_argument("--figures", default=2, help="Number of figures")
 args = parser.parse_args()
 
-if len(sys.argv) < 3:
+if len(sys.argv) < 2:
     parser.print_help()
     sys.exit(1)
 
@@ -79,8 +80,9 @@ def drawGraph(points, centroids):
 def generatePoints():
     if args.r:
         points = [Point(random.uniform(-5, -1), random.uniform(-1, 1)) for i in range(nPoints / 2)]
-        for i in range(nPoints / 2):
-            points.append(Point(random.uniform(1, 5), random.uniform(-1, 1)))
+        if int(args.figures) == 2:
+            for i in range(nPoints / 2):
+                points.append(Point(random.uniform(1, 5), random.uniform(-1, 1)))
         return points
     if args.c:
         points = []
@@ -88,18 +90,19 @@ def generatePoints():
             tmp = Point(random.uniform(-5, -1), random.uniform(-2, 2))
             if tmp.dist(Point(-3, 0)) < 2:
                 points.append(tmp)
-
-        while len(points) != nPoints:
-            tmp = Point(random.uniform(1, 5), random.uniform(-2, 2))
-            if tmp.dist(Point(3, 0)) < 2:
-                points.append(tmp)
+        if int(args.figures) == 2:
+            while len(points) != nPoints:
+                tmp = Point(random.uniform(1, 5), random.uniform(-2, 2))
+                if tmp.dist(Point(3, 0)) < 2:
+                    points.append(tmp)
 
         random.shuffle(points)
         return points
     if args.l:
         points =  [Point(random.uniform(-7, 7), 2) for i in range(nPoints / 2)]
-        for i in range(nPoints / 2):
-            points.append(Point(random.uniform(-7, 7), -2))
+        if int(args.figures) == 2:
+            for i in range(nPoints / 2):
+                points.append(Point(random.uniform(-7, 7), -2))
         return points
 
 
@@ -117,9 +120,9 @@ for i in range(epochs):
     for j in range(len(points)):
         if args.k:
             k = findMinK(points[j], centroids)
-            for q in range(len(centroids)):
-                inf = influenceKohonen(q, k)
-                centroids[q].updateCentroid(alpha, inf, points[j])
+            for idx, centroid in enumerate(centroids):
+                inf = influenceKohonen(idx, k)
+                centroid.updateCentroid(alpha, inf, points[j])
         if args.g:
             ranking = sorted(map(lambda centroid: (centroid, points[j].dist(centroid)), centroids), key=lambda k: k[1])
             ranking = map(lambda k: k[0], ranking)
