@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 import random
 import sys
 import argparse
+from math import sqrt
 
 parser = argparse.ArgumentParser()
 group = parser.add_mutually_exclusive_group()
@@ -77,6 +78,14 @@ def drawGraph(points, centroids):
     plt.savefig("plot" + str(it))
     it += 1
 
+def drawError(error, no):
+    plt.axis([0, epochs, 0, 6])
+    plt.title("Kohonen quantization error for " + str(args.figures) + " figures")
+    plt.xlabel("Iterations")
+    plt.legend(loc='upper right')
+    plt.ylabel("Quantization error")
+    plt.plot([i for i in range(len(error))], [i for i in error], label= str(no) + " centroids")
+
 def generatePoints():
     if args.r:
         points = [Point(random.uniform(-5, -1), random.uniform(-1, 1)) for i in range(nPoints // 2)]
@@ -108,37 +117,96 @@ def generatePoints():
 
 def generateCentroids():
     return [Centroid(random.uniform(-10, 10), random.uniform(-10, 10)) for i in range(nCentroids)]
-    
-points = generatePoints()
-centroids = generateCentroids()
+
+def deadCentroids(points, centroids):
+    X = [[] for i in range(len(centroids))]
+    for idp, point in enumerate(points):
+        l = []
+        for idc, centroid in enumerate(centroids):
+            l.append(point.dist(centroid))
+        # r = sorted(map(lambda centroid: (centroid, point.dist(centroid)), centroids), key=lambda k: k[1])
+        r = sorted([[idc, point.dist(centroid)] for idc, centroid in enumerate(centroids)], key = lambda k: k[1])[0][0]
+        X[r].append(point)
+
+    empty = []
+    for idx, x in enumerate(X):
+        if not x:
+            empty.append(idx)
+    return len(empty)
+
+def stdDeviation(mean, x):
+    sum = 0
+    for i in x:
+        sum += (i - mean)**2
+    return sqrt(sum / (len(x) - 1))
+
+
+def run(points, centroids):  
+    error = []
+    prevErr = calculateError(points, centroids)
+    print(prevErr)
+    # drawGraph(points, centroids)
+
+    for i in range(epochs):
+        for j in range(len(points)):
+            if args.k:
+                k = findMinK(points[j], centroids)
+                for idx, centroid in enumerate(centroids):
+                    inf = influenceKohonen(idx, k)
+                    centroid.updateCentroid(alpha, inf, points[j])
+            if args.g:
+                ranking = sorted(map(lambda centroid: (centroid, points[j].dist(centroid)), centroids), key=lambda k: k[1])
+                ranking = map(lambda k: k[0], ranking)
+                for idx, centroid in enumerate(ranking):
+                    inf = np.exp(-idx / l)
+                    centroid.updateCentroid(alpha, inf, points[j])
+        l = max(3.0 - i * 0.5, 0.1)
+        error.append(calculateError(points, centroids))
+        print(error[-1])
+        # if i < 30 or i % 25 == 0: drawGraph(points, centroids)
+        random.shuffle(points)
+
+    # drawError(error, len(centroids))
+
+    return error[-1], deadCentroids(points, centroids)
+
+# PART 1
+# nPoints = 400
+# plt.clf()
+# for i in range(2, 20, 2):
+#     nCentroids = i
+#     points = generatePoints()
+#     centroids = generateCentroids()
+#     run(points, centroids)
+# plt.savefig('error')
+
+# PART 2
+
 error = []
-prevErr = calculateError(points, centroids)
-print(prevErr)
-drawGraph(points, centroids)
+deads = []
 
-for i in range(epochs):
-    for j in range(len(points)):
-        if args.k:
-            k = findMinK(points[j], centroids)
-            for idx, centroid in enumerate(centroids):
-                inf = influenceKohonen(idx, k)
-                centroid.updateCentroid(alpha, inf, points[j])
-        if args.g:
-            ranking = sorted(map(lambda centroid: (centroid, points[j].dist(centroid)), centroids), key=lambda k: k[1])
-            ranking = map(lambda k: k[0], ranking)
-            for idx, centroid in enumerate(ranking):
-                inf = np.exp(-idx / l)
-                centroid.updateCentroid(alpha, inf, points[j])
-    l = max(3.0 - i * 0.5, 0.1)
-    newErr = calculateError(points, centroids)
-    print(newErr)
-    prevErr = newErr
-    error.append(prevErr)
-    if i < 30 or i % 25 == 0: drawGraph(points, centroids)
-    random.shuffle(points)
+nCentroids = 20
+nPoints = 500
+for i in range(100):
+    points = generatePoints()
+    centroids = generateCentroids()
+    val = run(points, centroids)
+    error.append(val[0])
+    deads.append(val[1])
 
+meanError = sum(error) / len(error)
+meanDeads = sum(deads) / len(deads)
+stdDevError = stdDeviation(meanError, error)
+stdDevDeads = stdDeviation(meanDeads, deads)
+with open("2figs.txt", 'a+') as f:
+    f.write("Alpha = %s\n" % alpha)
+    f.write("Starting lambda: %s\n" % l)
+    f.write("Number of centroids: %s\n" % nCentroids)
+    f.write("Number of points: %s\n" % nPoints)
+    f.write("Average error: %s\n" % meanError)
+    f.write("Error standard deviation: %s\n" % stdDevError)
+    f.write("Minimum error: %s\n" % min(error))
+    f.write("Average dead centroids: %s\n" % meanDeads)
+    f.write("Dead centroids standard deviation: %s\n\n" % stdDevDeads)
 
-plt.clf()
-plt.axis([0, len(error), min(error) - 0.1, max(error) + 0.1])
-plt.plot([i for i in range(len(error))], [i for i in error])
-plt.savefig("error")
+    
