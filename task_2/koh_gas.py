@@ -21,6 +21,7 @@ parser.add_argument("-e", default=15, help="Number of iterations")
 parser.add_argument("-n", default=10, help="Number of centroids")
 parser.add_argument("-N", default=200, help="Number of points")
 parser.add_argument("--figures", default=2, help="Number of figures")
+parser.add_argument("--no-dead", default=False, help="No dead centroids on generate", action="store_true")
 args = parser.parse_args()
 
 if len(sys.argv) < 3:
@@ -115,8 +116,15 @@ def generatePoints():
         return points
 
 
-def generateCentroids():
-    return [Centroid(random.uniform(-10, 10), random.uniform(-10, 10)) for i in range(nCentroids)]
+def generateCentroids(points):
+    centroids = [Centroid(random.uniform(-10, 10), random.uniform(-10, 10)) for i in range(nCentroids)]
+    if args.no_dead:
+        e = deadCentroids(points, centroids)
+        while len(e) != 0:
+            for i in e:
+                centroids[i] = Centroid(random.uniform(-10, 10), random.uniform(-10, 10))
+            e = deadCentroids(points, centroids)
+    return centroids
 
 def deadCentroids(points, centroids):
     X = [[] for i in range(len(centroids))]
@@ -132,7 +140,7 @@ def deadCentroids(points, centroids):
     for idx, x in enumerate(X):
         if not x:
             empty.append(idx)
-    return len(empty)
+    return empty
 
 def stdDeviation(mean, x):
     sum = 0
@@ -142,6 +150,7 @@ def stdDeviation(mean, x):
 
 
 def run(points, centroids):  
+    global l
     error = []
     prevErr = calculateError(points, centroids)
     print(prevErr)
@@ -177,36 +186,203 @@ def run(points, centroids):
 #     nCentroids = i
 #     points = generatePoints()
 #     centroids = generateCentroids()
+#     l = 3.0
 #     run(points, centroids)
 # plt.savefig('error')
 
 # PART 2
-
-error = []
-deads = []
-
 nCentroids = 20
-nPoints = 500
-for i in range(100):
-    points = generatePoints()
-    centroids = generateCentroids()
-    val = run(points, centroids)
-    error.append(val[0])
-    deads.append(val[1])
+nPoints = 400
 
-meanError = sum(error) / len(error)
-meanDeads = sum(deads) / len(deads)
-stdDevError = stdDeviation(meanError, error)
-stdDevDeads = stdDeviation(meanDeads, deads)
-with open("2figs.txt", 'a+') as f:
-    f.write("Alpha = %s\n" % alpha)
-    f.write("Starting lambda: %s\n" % l)
-    f.write("Number of centroids: %s\n" % nCentroids)
-    f.write("Number of points: %s\n" % nPoints)
-    f.write("Average error: %s\n" % meanError)
-    f.write("Error standard deviation: %s\n" % stdDevError)
-    f.write("Minimum error: %s\n" % min(error))
-    f.write("Average dead centroids: %s\n" % meanDeads)
-    f.write("Dead centroids standard deviation: %s\n\n" % stdDevDeads)
+variationAlpha = [0.1, 0.3, 0.7, 0.9, 0.3, 0.9]
+variationLambda = [3.0, 1.5, 4.0, 2.0, 3.0, 1.5]
+for i in range(len(variationAlpha)):
+    error = []
+    deads = []
+
+    alpha = variationAlpha[i]
+    l = variationLambda[i]
+    for j in range(100):
+        points = generatePoints()
+        centroids = generateCentroids(points)
+        val = run(points, centroids)
+        l = variationAlpha[i]
+        error.append(val[0])
+        deads.append(len(val[1]))
+
+    meanError = sum(error) / len(error)
+    meanDeads = sum(deads) / len(deads)
+    stdDevError = stdDeviation(meanError, error)
+    stdDevDeads = stdDeviation(meanDeads, deads)
+    with open("2figs.txt", 'a+') as f:
+        f.write("Alpha = %s\n" % alpha)
+        f.write("Starting lambda: %s\n" % l)
+        f.write("Number of centroids: %s\n" % nCentroids)
+        f.write("Number of points: %s\n" % nPoints)
+        f.write("Average error: %s\n" % meanError)
+        f.write("Error standard deviation: %s\n" % stdDevError)
+        f.write("Minimum error: %s\n" % min(error))
+        f.write("Average dead centroids: %s\n" % meanDeads)
+        f.write("Dead centroids standard deviation: %s\n\n" % stdDevDeads)
+
+
+
 
     
+# error = []
+# deads = []
+
+# nCentroids = 20
+# nPoints = 400
+# alpha = 0.3
+# l = 1.5 
+# for i in range(100):
+#     points = generatePoints()
+#     centroids = generateCentroids()
+#     val = run(points, centroids)
+#     l = 1.5
+#     error.append(val[0])
+#     deads.append(val[1])
+
+# meanError = sum(error) / len(error)
+# meanDeads = sum(deads) / len(deads)
+# stdDevError = stdDeviation(meanError, error)
+# stdDevDeads = stdDeviation(meanDeads, deads)
+# with open("2figs.txt", 'a+') as f:
+#     f.write("Alpha = %s\n" % alpha)
+#     f.write("Starting lambda: %s\n" % l)
+#     f.write("Number of centroids: %s\n" % nCentroids)
+#     f.write("Number of points: %s\n" % nPoints)
+#     f.write("Average error: %s\n" % meanError)
+#     f.write("Error standard deviation: %s\n" % stdDevError)
+#     f.write("Minimum error: %s\n" % min(error))
+#     f.write("Average dead centroids: %s\n" % meanDeads)
+#     f.write("Dead centroids standard deviation: %s\n\n" % stdDevDeads)
+
+
+
+# error = []
+# deads = []
+
+# nCentroids = 20
+# nPoints = 400
+# alpha = 0.7 
+# l = 4.0
+# for i in range(100):
+#     points = generatePoints()
+#     centroids = generateCentroids()
+#     val = run(points, centroids)
+#     l = 4.0
+#     error.append(val[0])
+#     deads.append(val[1])
+
+# meanError = sum(error) / len(error)
+# meanDeads = sum(deads) / len(deads)
+# stdDevError = stdDeviation(meanError, error)
+# stdDevDeads = stdDeviation(meanDeads, deads)
+# with open("2figs.txt", 'a+') as f:
+#     f.write("Alpha = %s\n" % alpha)
+#     f.write("Starting lambda: %s\n" % l)
+#     f.write("Number of centroids: %s\n" % nCentroids)
+#     f.write("Number of points: %s\n" % nPoints)
+#     f.write("Average error: %s\n" % meanError)
+#     f.write("Error standard deviation: %s\n" % stdDevError)
+#     f.write("Minimum error: %s\n" % min(error))
+#     f.write("Average dead centroids: %s\n" % meanDeads)
+#     f.write("Dead centroids standard deviation: %s\n\n" % stdDevDeads)
+
+
+
+# error = []
+# deads = []
+
+# nCentroids = 20
+# nPoints = 400
+# alpha = 0.9 
+# l = 2.0
+# for i in range(100):
+#     points = generatePoints()
+#     centroids = generateCentroids()
+#     val = run(points, centroids)
+#     l = 2.0
+#     error.append(val[0])
+#     deads.append(val[1])
+
+# meanError = sum(error) / len(error)
+# meanDeads = sum(deads) / len(deads)
+# stdDevError = stdDeviation(meanError, error)
+# stdDevDeads = stdDeviation(meanDeads, deads)
+# with open("2figs.txt", 'a+') as f:
+#     f.write("Alpha = %s\n" % alpha)
+#     f.write("Starting lambda: %s\n" % l)
+#     f.write("Number of centroids: %s\n" % nCentroids)
+#     f.write("Number of points: %s\n" % nPoints)
+#     f.write("Average error: %s\n" % meanError)
+#     f.write("Error standard deviation: %s\n" % stdDevError)
+#     f.write("Minimum error: %s\n" % min(error))
+#     f.write("Average dead centroids: %s\n" % meanDeads)
+#     f.write("Dead centroids standard deviation: %s\n\n" % stdDevDeads)
+
+
+
+# error = []
+# deads = []
+
+# nCentroids = 20
+# nPoints = 400
+# alpha = 0.9 
+# l = 1.5
+# for i in range(100):
+#     points = generatePoints()
+#     centroids = generateCentroids()
+#     val = run(points, centroids)
+#     l = 1.5
+#     error.append(val[0])
+#     deads.append(val[1])
+
+# meanError = sum(error) / len(error)
+# meanDeads = sum(deads) / len(deads)
+# stdDevError = stdDeviation(meanError, error)
+# stdDevDeads = stdDeviation(meanDeads, deads)
+# with open("2figs.txt", 'a+') as f:
+#     f.write("Alpha = %s\n" % alpha)
+#     f.write("Starting lambda: %s\n" % l)
+#     f.write("Number of centroids: %s\n" % nCentroids)
+#     f.write("Number of points: %s\n" % nPoints)
+#     f.write("Average error: %s\n" % meanError)
+#     f.write("Error standard deviation: %s\n" % stdDevError)
+#     f.write("Minimum error: %s\n" % min(error))
+#     f.write("Average dead centroids: %s\n" % meanDeads)
+#     f.write("Dead centroids standard deviation: %s\n\n" % stdDevDeads)
+
+
+
+# error = []
+# deads = []
+
+# nCentroids = 20
+# nPoints = 400
+# alpha = 0.3 
+# l = 3.0
+# for i in range(100):
+#     points = generatePoints()
+#     centroids = generateCentroids()
+#     val = run(points, centroids)
+#     l = 3.0
+#     error.append(val[0])
+#     deads.append(val[1])
+
+# meanError = sum(error) / len(error)
+# meanDeads = sum(deads) / len(deads)
+# stdDevError = stdDeviation(meanError, error)
+# stdDevDeads = stdDeviation(meanDeads, deads)
+# with open("2figs.txt", 'a+') as f:
+#     f.write("Alpha = %s\n" % alpha)
+#     f.write("Starting lambda: %s\n" % l)
+#     f.write("Number of centroids: %s\n" % nCentroids)
+#     f.write("Number of points: %s\n" % nPoints)
+#     f.write("Average error: %s\n" % meanError)
+#     f.write("Error standard deviation: %s\n" % stdDevError)
+#     f.write("Minimum error: %s\n" % min(error))
+#     f.write("Average dead centroids: %s\n" % meanDeads)
+#     f.write("Dead centroids standard deviation: %s\n\n" % stdDevDeads)

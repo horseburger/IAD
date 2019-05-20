@@ -44,7 +44,7 @@ def drawGraph(X, c):
 
     plt.scatter([i[0] for i in X], [i[1] for i in X], s=2, c='k')
     plt.scatter([i[0] for i in c], [i[1] for i in c], s=6, c='r')
-    plt.plot([i[0] for i in c], [i[1] for i in c], 'r')
+    #plt.plot([i[0] for i in c], [i[1] for i in c], 'r')
     plt.axis([-10.1, 10.1, -10.1, 10.1])
     plt.grid() 
     global it
