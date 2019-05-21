@@ -77,6 +77,7 @@ def drawGraph(points, centroids):
     # plt.plot([i.x for i in centroids], [i.y for i in centroids], 'g')
     plt.axis([-10.1, 10.1, -10.1, 10.1])
     plt.grid()
+    plt.title(("Kohonen" if args.k else "Neural gas") + " Voronoi diagram for " + str(nCentroids) + " centroids")
     global it
     plt.savefig("plot" + str(it))
     it += 1
@@ -157,7 +158,7 @@ def run(points, centroids):
     error = []
     prevErr = calculateError(points, centroids)
     print(prevErr)
-    # drawGraph(points, centroids)
+    drawGraph(points, centroids)
 
     for i in range(epochs):
         for j in range(len(points)):
@@ -175,13 +176,17 @@ def run(points, centroids):
         l = max(3.0 - i * 0.5, 0.1)
         error.append(calculateError(points, centroids))
         print(error[-1])
-        # if i < 30 or i % 25 == 0: drawGraph(points, centroids)
+        if i < 30 or i % 25 == 0: drawGraph(points, centroids)
         random.shuffle(points)
 
-    # drawError(error, len(centroids))
+    drawError(error, len(centroids))
 
     return error[-1], deadCentroids(points, centroids)
 
+
+points = generatePoints()
+centroids = generateCentroids(points)
+run(points, centroids)
 
 # PART 1
 # nPoints = 400
@@ -215,7 +220,7 @@ def run(points, centroids):
 #         deads.append(len(val[1]))
 
 #     meanError = sum(error) / len(error)
-#     meanDeads = sum(deads) / len(deads)
+#     meanDeads = sum(deads) / (len(deads) * 1.0)
 #     stdDevError = stdDeviation(meanError, error)
 #     stdDevDeads = stdDeviation(meanDeads, deads)
 #     with open("2figs" + str(args.no_dead) + ".txt", 'a+') as f:
@@ -234,7 +239,7 @@ def run(points, centroids):
 plt.clf()
 points = generatePoints()
 centroids = generateCentroids(points)
-firstCentroids = copy.deepcopy(centroids)
+# firstCentroids = copy.deepcopy(centroids)
 run(points, centroids)
 if nCentroids != 2:
     voronoi_plot_2d(Voronoi(np.array([[centroid.x, centroid.y] for centroid in centroids])), show_points=False, line_width=1,line_colors='#0000FF', show_vertices=False)
@@ -242,7 +247,7 @@ else:
     distance = centroids[0].dist(centroids[1])
     plt.plot([centroids[0].x - distance / 2, centroids[1].x + distance / 2], [-10, 10], 'b')
 drawGraph(points, centroids)
-plt.scatter([c.x for c in firstCentroids], [c.y for c in firstCentroids], s=9, c='g', marker='^')
-for i in range(len(centroids)):
-    plt.plot([firstCentroids[i].x, centroids[i].x], [firstCentroids[i].y, centroids[i].y], 'g', linewidth=0.5)
-plt.savefig("vornoi" + str(nCentroids) + ("Kohonen" if args.k else "Gas") + "_" + str(args.figures) + "f")
+# plt.scatter([c.x for c in firstCentroids], [c.y for c in firstCentroids], s=9, c='g', marker='^')
+# for i in range(len(centroids)):
+    # plt.plot([firstCentroids[i].x, centroids[i].x], [firstCentroids[i].y, centroids[i].y], 'g', linewidth=0.5)
+plt.savefig("voronoi" + str(nCentroids) + ("Kohonen" if args.k else "Gas") + "_" + str(args.figures) + "f", dpi=400)
