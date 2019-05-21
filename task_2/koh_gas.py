@@ -7,6 +7,8 @@ import random
 import sys
 import argparse
 from math import sqrt
+from scipy.spatial import Voronoi, voronoi_plot_2d
+import copy
 
 parser = argparse.ArgumentParser()
 group = parser.add_mutually_exclusive_group()
@@ -18,8 +20,8 @@ algs.add_argument("-k", help="Use Kohonen's algorithm", action="store_true")
 algs.add_argument("-g",help="Use neural gas", action="store_true")
 parser.add_argument("--wta", help="Use WTA with Kohonen's algorithm (default WTM)", action="store_true")
 parser.add_argument("-e", default=15, help="Number of iterations")
-parser.add_argument("-n", default=10, help="Number of centroids")
-parser.add_argument("-N", default=200, help="Number of points")
+parser.add_argument("-n", default=20, help="Number of centroids")
+parser.add_argument("-N", default=400, help="Number of points")
 parser.add_argument("--figures", default=2, help="Number of figures")
 parser.add_argument("--no-dead", default=False, help="No dead centroids on generate", action="store_true")
 args = parser.parse_args()
@@ -69,10 +71,10 @@ def influenceKohonen(k, kx):
     return np.exp(-w)
 
 def drawGraph(points, centroids):
-    plt.clf()
-    plt.scatter([i.x for i in centroids], [i.y for i in centroids], s=6, c='r')
+    # plt.clf()
     plt.scatter([i.x for i in points], [i.y for i in points], s=2, c='k')
-    plt.plot([i.x for i in centroids], [i.y for i in centroids], 'g')
+    plt.scatter([i.x for i in centroids], [i.y for i in centroids], s=6, c='r')
+    # plt.plot([i.x for i in centroids], [i.y for i in centroids], 'g')
     plt.axis([-10.1, 10.1, -10.1, 10.1])
     plt.grid()
     global it
@@ -81,7 +83,8 @@ def drawGraph(points, centroids):
 
 def drawError(error, no):
     plt.axis([0, epochs, 0, 6])
-    plt.title("Kohonen quantization error for " + str(args.figures) + " figures")
+    t = "Kohonen" if args.k else "Neural gas"
+    plt.title(t + "quantization error for " + str(args.figures) + " figures")
     plt.xlabel("Iterations")
     plt.legend(loc='upper right')
     plt.ylabel("Quantization error")
@@ -179,6 +182,7 @@ def run(points, centroids):
 
     return error[-1], deadCentroids(points, centroids)
 
+
 # PART 1
 # nPoints = 400
 # plt.clf()
@@ -191,198 +195,52 @@ def run(points, centroids):
 # plt.savefig('error')
 
 # PART 2
-nCentroids = 20
-nPoints = 400
-
-variationAlpha = [0.1, 0.3, 0.7, 0.9, 0.3, 0.9]
-variationLambda = [3.0, 1.5, 4.0, 2.0, 3.0, 1.5]
-for i in range(len(variationAlpha)):
-    error = []
-    deads = []
-
-    alpha = variationAlpha[i]
-    l = variationLambda[i]
-    for j in range(100):
-        points = generatePoints()
-        centroids = generateCentroids(points)
-        val = run(points, centroids)
-        l = variationAlpha[i]
-        error.append(val[0])
-        deads.append(len(val[1]))
-
-    meanError = sum(error) / len(error)
-    meanDeads = sum(deads) / len(deads)
-    stdDevError = stdDeviation(meanError, error)
-    stdDevDeads = stdDeviation(meanDeads, deads)
-    with open("2figs.txt", 'a+') as f:
-        f.write("Alpha = %s\n" % alpha)
-        f.write("Starting lambda: %s\n" % l)
-        f.write("Number of centroids: %s\n" % nCentroids)
-        f.write("Number of points: %s\n" % nPoints)
-        f.write("Average error: %s\n" % meanError)
-        f.write("Error standard deviation: %s\n" % stdDevError)
-        f.write("Minimum error: %s\n" % min(error))
-        f.write("Average dead centroids: %s\n" % meanDeads)
-        f.write("Dead centroids standard deviation: %s\n\n" % stdDevDeads)
-
-
-
-
-    
-# error = []
-# deads = []
-
 # nCentroids = 20
 # nPoints = 400
-# alpha = 0.3
-# l = 1.5 
-# for i in range(100):
-#     points = generatePoints()
-#     centroids = generateCentroids()
-#     val = run(points, centroids)
-#     l = 1.5
-#     error.append(val[0])
-#     deads.append(val[1])
 
-# meanError = sum(error) / len(error)
-# meanDeads = sum(deads) / len(deads)
-# stdDevError = stdDeviation(meanError, error)
-# stdDevDeads = stdDeviation(meanDeads, deads)
-# with open("2figs.txt", 'a+') as f:
-#     f.write("Alpha = %s\n" % alpha)
-#     f.write("Starting lambda: %s\n" % l)
-#     f.write("Number of centroids: %s\n" % nCentroids)
-#     f.write("Number of points: %s\n" % nPoints)
-#     f.write("Average error: %s\n" % meanError)
-#     f.write("Error standard deviation: %s\n" % stdDevError)
-#     f.write("Minimum error: %s\n" % min(error))
-#     f.write("Average dead centroids: %s\n" % meanDeads)
-#     f.write("Dead centroids standard deviation: %s\n\n" % stdDevDeads)
+# variationAlpha = [0.1, 0.3, 0.7, 0.9, 0.3, 0.9]
+# variationLambda = [3.0, 1.5, 4.0, 2.0, 3.0, 1.5]
+# for i in range(len(variationAlpha)):
+#     error = []
+#     deads = []
 
+#     alpha = variationAlpha[i]
+#     l = variationLambda[i]
+#     for j in range(100):
+#         points = generatePoints()
+#         centroids = generateCentroids(points)
+#         val = run(points, centroids)
+#         l = variationLambda[i]
+#         error.append(val[0])
+#         deads.append(len(val[1]))
 
-
-# error = []
-# deads = []
-
-# nCentroids = 20
-# nPoints = 400
-# alpha = 0.7 
-# l = 4.0
-# for i in range(100):
-#     points = generatePoints()
-#     centroids = generateCentroids()
-#     val = run(points, centroids)
-#     l = 4.0
-#     error.append(val[0])
-#     deads.append(val[1])
-
-# meanError = sum(error) / len(error)
-# meanDeads = sum(deads) / len(deads)
-# stdDevError = stdDeviation(meanError, error)
-# stdDevDeads = stdDeviation(meanDeads, deads)
-# with open("2figs.txt", 'a+') as f:
-#     f.write("Alpha = %s\n" % alpha)
-#     f.write("Starting lambda: %s\n" % l)
-#     f.write("Number of centroids: %s\n" % nCentroids)
-#     f.write("Number of points: %s\n" % nPoints)
-#     f.write("Average error: %s\n" % meanError)
-#     f.write("Error standard deviation: %s\n" % stdDevError)
-#     f.write("Minimum error: %s\n" % min(error))
-#     f.write("Average dead centroids: %s\n" % meanDeads)
-#     f.write("Dead centroids standard deviation: %s\n\n" % stdDevDeads)
+#     meanError = sum(error) / len(error)
+#     meanDeads = sum(deads) / len(deads)
+#     stdDevError = stdDeviation(meanError, error)
+#     stdDevDeads = stdDeviation(meanDeads, deads)
+#     with open("2figs" + str(args.no_dead) + ".txt", 'a+') as f:
+#         f.write("Alpha = %s\n" % alpha)
+#         f.write("Starting lambda: %s\n" % l)
+#         f.write("Number of centroids: %s\n" % nCentroids)
+#         f.write("Number of points: %s\n" % nPoints)
+#         f.write("Average error: %s\n" % meanError)
+#         f.write("Error standard deviation: %s\n" % stdDevError)
+#         f.write("Minimum error: %s\n" % min(error))
+#         f.write("Average dead centroids: %s\n" % meanDeads)
+#         f.write("Dead centroids standard deviation: %s\n\n" % stdDevDeads)
 
 
-
-# error = []
-# deads = []
-
-# nCentroids = 20
-# nPoints = 400
-# alpha = 0.9 
-# l = 2.0
-# for i in range(100):
-#     points = generatePoints()
-#     centroids = generateCentroids()
-#     val = run(points, centroids)
-#     l = 2.0
-#     error.append(val[0])
-#     deads.append(val[1])
-
-# meanError = sum(error) / len(error)
-# meanDeads = sum(deads) / len(deads)
-# stdDevError = stdDeviation(meanError, error)
-# stdDevDeads = stdDeviation(meanDeads, deads)
-# with open("2figs.txt", 'a+') as f:
-#     f.write("Alpha = %s\n" % alpha)
-#     f.write("Starting lambda: %s\n" % l)
-#     f.write("Number of centroids: %s\n" % nCentroids)
-#     f.write("Number of points: %s\n" % nPoints)
-#     f.write("Average error: %s\n" % meanError)
-#     f.write("Error standard deviation: %s\n" % stdDevError)
-#     f.write("Minimum error: %s\n" % min(error))
-#     f.write("Average dead centroids: %s\n" % meanDeads)
-#     f.write("Dead centroids standard deviation: %s\n\n" % stdDevDeads)
-
-
-
-# error = []
-# deads = []
-
-# nCentroids = 20
-# nPoints = 400
-# alpha = 0.9 
-# l = 1.5
-# for i in range(100):
-#     points = generatePoints()
-#     centroids = generateCentroids()
-#     val = run(points, centroids)
-#     l = 1.5
-#     error.append(val[0])
-#     deads.append(val[1])
-
-# meanError = sum(error) / len(error)
-# meanDeads = sum(deads) / len(deads)
-# stdDevError = stdDeviation(meanError, error)
-# stdDevDeads = stdDeviation(meanDeads, deads)
-# with open("2figs.txt", 'a+') as f:
-#     f.write("Alpha = %s\n" % alpha)
-#     f.write("Starting lambda: %s\n" % l)
-#     f.write("Number of centroids: %s\n" % nCentroids)
-#     f.write("Number of points: %s\n" % nPoints)
-#     f.write("Average error: %s\n" % meanError)
-#     f.write("Error standard deviation: %s\n" % stdDevError)
-#     f.write("Minimum error: %s\n" % min(error))
-#     f.write("Average dead centroids: %s\n" % meanDeads)
-#     f.write("Dead centroids standard deviation: %s\n\n" % stdDevDeads)
-
-
-
-# error = []
-# deads = []
-
-# nCentroids = 20
-# nPoints = 400
-# alpha = 0.3 
-# l = 3.0
-# for i in range(100):
-#     points = generatePoints()
-#     centroids = generateCentroids()
-#     val = run(points, centroids)
-#     l = 3.0
-#     error.append(val[0])
-#     deads.append(val[1])
-
-# meanError = sum(error) / len(error)
-# meanDeads = sum(deads) / len(deads)
-# stdDevError = stdDeviation(meanError, error)
-# stdDevDeads = stdDeviation(meanDeads, deads)
-# with open("2figs.txt", 'a+') as f:
-#     f.write("Alpha = %s\n" % alpha)
-#     f.write("Starting lambda: %s\n" % l)
-#     f.write("Number of centroids: %s\n" % nCentroids)
-#     f.write("Number of points: %s\n" % nPoints)
-#     f.write("Average error: %s\n" % meanError)
-#     f.write("Error standard deviation: %s\n" % stdDevError)
-#     f.write("Minimum error: %s\n" % min(error))
-#     f.write("Average dead centroids: %s\n" % meanDeads)
-#     f.write("Dead centroids standard deviation: %s\n\n" % stdDevDeads)
+# PART 3
+plt.clf()
+points = generatePoints()
+centroids = generateCentroids(points)
+firstCentroids = copy.deepcopy(centroids)
+run(points, centroids)
+# voronoi_plot_2d(Voronoi(np.array([[centroid.x, centroid.y] for centroid in centroids])), show_points=False, line_width=1,line_colors='#0000FF', show_vertices=False)
+drawGraph(points, centroids)
+distance = centroids[0].dist(centroids[1])
+plt.plot([centroids[0].x - distance / 2, centroids[1].x + distance / 2], [-10, 10], 'b')
+plt.scatter([c.x for c in firstCentroids], [c.y for c in firstCentroids], s=9, c='g', marker='^')
+for i in range(len(centroids)):
+    plt.plot([firstCentroids[i].x, centroids[i].x], [firstCentroids[i].y, centroids[i].y], 'g', linewidth=0.5)
+plt.savefig("vornoi" + str(nCentroids) + ("Kohonen" if args.k else "Gas") + "_" + str(args.figures) + "f")
