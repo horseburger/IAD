@@ -236,10 +236,12 @@ points = generatePoints()
 centroids = generateCentroids(points)
 firstCentroids = copy.deepcopy(centroids)
 run(points, centroids)
-# voronoi_plot_2d(Voronoi(np.array([[centroid.x, centroid.y] for centroid in centroids])), show_points=False, line_width=1,line_colors='#0000FF', show_vertices=False)
+if nCentroids != 2:
+    voronoi_plot_2d(Voronoi(np.array([[centroid.x, centroid.y] for centroid in centroids])), show_points=False, line_width=1,line_colors='#0000FF', show_vertices=False)
+else:
+    distance = centroids[0].dist(centroids[1])
+    plt.plot([centroids[0].x - distance / 2, centroids[1].x + distance / 2], [-10, 10], 'b')
 drawGraph(points, centroids)
-distance = centroids[0].dist(centroids[1])
-plt.plot([centroids[0].x - distance / 2, centroids[1].x + distance / 2], [-10, 10], 'b')
 plt.scatter([c.x for c in firstCentroids], [c.y for c in firstCentroids], s=9, c='g', marker='^')
 for i in range(len(centroids)):
     plt.plot([firstCentroids[i].x, centroids[i].x], [firstCentroids[i].y, centroids[i].y], 'g', linewidth=0.5)
