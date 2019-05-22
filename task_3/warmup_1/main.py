@@ -19,8 +19,9 @@ def dist(a, b):
 def calculateOutput(weights, z):
     sum = weights[0]
     for i in range(1, len(weights)):
-        sum += weights[i] * z[i]
+        sum += weights[i] * z[i - 1]
     return sum
+
 
 def gaussFunction(d, sigm):
     return np.exp(-(d**2 / 2 * (sigm)**2))
@@ -34,9 +35,22 @@ centers = sorted(generateCenters(k))
 sigms = generateSigm(k)
 weights = generateWeights(k)
 
-x = [i for i in np.arange(0, 10, 0.1)]
-y = []
+x = [i for i in np.arange(0, 10, 0.01)]
 
-plt.clf()
-plt.plot([i for i in x], [i for i in p])
+y = []
+z = []
+for i in range(len(x)):
+    radials = []
+    for j in range(len(centers)):
+        radials.append(calculateRadial(x[i], centers[j], sigms[j]))
+    z.append(radials)
+
+for i in range(k):
+    plt.plot([j for j in x], [j[i] * weights[i] for j in z], 'r')
+
+for radial in z:
+    y.append(calculateOutput(weights, radial))
+
+plt.plot([i for i in x], [i for i in y], 'k')
+plt.grid()
 plt.show()
