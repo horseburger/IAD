@@ -7,7 +7,7 @@ import random
 import sys
 import argparse
 from math import sqrt
-from scipy.spatial import Voronoi, voronoi_plot_2d
+# from scipy.spatial import Voronoi, voronoi_plot_2d
 import copy
 
 parser = argparse.ArgumentParser()
@@ -236,18 +236,18 @@ run(points, centroids)
 
 
 # PART 3
-plt.clf()
-points = generatePoints()
-centroids = generateCentroids(points)
-# firstCentroids = copy.deepcopy(centroids)
-run(points, centroids)
-if nCentroids != 2:
-    voronoi_plot_2d(Voronoi(np.array([[centroid.x, centroid.y] for centroid in centroids])), show_points=False, line_width=1,line_colors='#0000FF', show_vertices=False)
-else:
-    distance = centroids[0].dist(centroids[1])
-    plt.plot([centroids[0].x - distance / 2, centroids[1].x + distance / 2], [-10, 10], 'b')
-drawGraph(points, centroids)
-# plt.scatter([c.x for c in firstCentroids], [c.y for c in firstCentroids], s=9, c='g', marker='^')
-# for i in range(len(centroids)):
-    # plt.plot([firstCentroids[i].x, centroids[i].x], [firstCentroids[i].y, centroids[i].y], 'g', linewidth=0.5)
-plt.savefig("voronoi" + str(nCentroids) + ("Kohonen" if args.k else "Gas") + "_" + str(args.figures) + "f", dpi=400)
+# plt.clf()
+# points = generatePoints()
+# centroids = generateCentroids(points)
+# # firstCentroids = copy.deepcopy(centroids)
+# run(points, centroids)
+# if nCentroids != 2:
+#     voronoi_plot_2d(Voronoi(np.array([[centroid.x, centroid.y] for centroid in centroids])), show_points=False, line_width=1,line_colors='#0000FF', show_vertices=False)
+# else:
+#     distance = centroids[0].dist(centroids[1])
+#     plt.plot([centroids[0].x - distance / 2, centroids[1].x + distance / 2], [-10, 10], 'b')
+# drawGraph(points, centroids)
+# # plt.scatter([c.x for c in firstCentroids], [c.y for c in firstCentroids], s=9, c='g', marker='^')
+# # for i in range(len(centroids)):
+#     # plt.plot([firstCentroids[i].x, centroids[i].x], [firstCentroids[i].y, centroids[i].y], 'g', linewidth=0.5)
+# plt.savefig("voronoi" + str(nCentroids) + ("Kohonen" if args.k else "Gas") + "_" + str(args.figures) + "f", dpi=400)
