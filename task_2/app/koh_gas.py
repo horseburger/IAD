@@ -71,13 +71,14 @@ def influenceKohonen(k, kx):
     return np.exp(-w)
 
 def drawGraph(points, centroids):
-    # plt.clf()
+    plt.clf()
     plt.scatter([i.x for i in points], [i.y for i in points], s=2, c='k')
     plt.scatter([i.x for i in centroids], [i.y for i in centroids], s=6, c='r')
-    # plt.plot([i.x for i in centroids], [i.y for i in centroids], 'g')
+    plt.plot([i.x for i in centroids], [i.y for i in centroids], 'g')
     plt.axis([-10.1, 10.1, -10.1, 10.1])
     plt.grid()
     plt.title(("Kohonen" if args.k else "Neural gas") + " Voronoi diagram for " + str(nCentroids) + " centroids")
+    # plt.show()
     global it
     plt.savefig("plot" + str(it))
     it += 1
@@ -90,6 +91,7 @@ def drawError(error, no):
     plt.legend(loc='upper right')
     plt.ylabel("Quantization error")
     plt.plot([i for i in range(len(error))], [i for i in error], label= str(no) + " centroids")
+    plt.savefig("error")
 
 def generatePoints():
     if args.r:
@@ -133,10 +135,6 @@ def generateCentroids(points):
 def deadCentroids(points, centroids):
     X = [[] for i in range(len(centroids))]
     for idp, point in enumerate(points):
-        l = []
-        for idc, centroid in enumerate(centroids):
-            l.append(point.dist(centroid))
-        # r = sorted(map(lambda centroid: (centroid, point.dist(centroid)), centroids), key=lambda k: k[1])
         r = sorted([[idc, point.dist(centroid)] for idc, centroid in enumerate(centroids)], key = lambda k: k[1])[0][0]
         X[r].append(point)
 

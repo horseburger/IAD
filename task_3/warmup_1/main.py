@@ -24,13 +24,13 @@ def calculateOutput(weights, z):
 
 
 def gaussFunction(d, sigm):
-    return np.exp(-(d**2 / 2 * (sigm)**2))
+    return np.exp(-(d**2 / 2.0 * (sigm)**2))
 
 def calculateRadial(x, c, sigm):
     return gaussFunction(dist(x, c), sigm)
 
 
-k = 10
+k = 4
 centers = sorted(generateCenters(k))
 sigms = generateSigm(k)
 weights = generateWeights(k)
@@ -39,14 +39,11 @@ x = [i for i in np.arange(0, 10, 0.01)]
 
 y = []
 z = []
-for i in range(len(x)):
-    radials = []
-    for j in range(len(centers)):
-        radials.append(calculateRadial(x[i], centers[j], sigms[j]))
-    z.append(radials)
+for point in x:
+    z.append([calculateRadial(point, center, sigms[j]) for j, center in enumerate(centers)])
 
-for i in range(k):
-    plt.plot([j for j in x], [j[i] * weights[i] for j in z], 'r')
+for i in range(1, k + 1):
+    plt.plot([j for j in x], [j[i - 1] * weights[i] for j in z], 'r')
 
 for radial in z:
     y.append(calculateOutput(weights, radial))
