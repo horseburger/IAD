@@ -70,7 +70,6 @@ def findParams(x):
             if learn:
                 for idw in range(len(weights)):
                     weights[idw] -= alpha * partialDerivative(output[-1], y[idx], 1 if not idw else radialZ[idw - 1])
-        # err = calculateError(output, y)
         error.append(calculateError(output, y))
         if i % 200 == 0:
             print(error[-1])
@@ -81,7 +80,7 @@ def findParams(x):
     return radials, error
 
 
-k = 10
+k = 4
 iterations = 5000
 alpha = 0.01
 eps = 0.01
@@ -95,7 +94,7 @@ weights = generateWeights(k)
 
 radials, error = findParams(x)
 plt.plot([i for i in range(len(error))], [i for i in error])
-plt.savefig("error")
+plt.savefig("error" + str(k))
 plt.clf()
 for idr in range(1, k + 1):
     plt.plot([i for i in x], [z[idr - 1] * weights[idr] for z in radials], 'r')
@@ -105,4 +104,5 @@ plt.scatter([i for i in x], [i for i in y], s=2, c='g')
 learn = False
 plt.plot([i for i in x], [i for i in findParams(x)], 'b')
 plt.scatter([center for center in centers], [0 for i in range(len(centers))])
-plt.show()
+# plt.show()
+plt.savefig("out" + str(k))
