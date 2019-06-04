@@ -2,7 +2,6 @@ import matplotlib.pyplot as plt
 import numpy as np
 import random
 import math
-from neuron import Neuron
 
 def readData(filename):
     data = []
@@ -51,37 +50,39 @@ def calculateError(f, y):
     # return (f - y)**2 / 2
 
 def partialDerivative(f, y, z):
-    sum = 0
-    for i in range(len(f)):
-        sum += (f[i] - y[i]) * z
-    return (sum / len(f))
-    # return ((f - y) * z) / 2
+    # sum = 0
+    # for i in range(len(f)):
+        # sum += (f[i] - y[i]) * z
+    # return (sum / len(f))
+    return ((f - y) * z) / 2
 
 def findParams(x):
+    error = []
     for i in range(iterations):
+        radials = []
         output = []
         for idx in range(len(x)):
-            radialZ = list(map(calculateRadial, [x[idx] for i in range(k)], centers, [sigma for i in range(k)]))
+            radialZ = list(map(calculateRadial, [x[idx] for j in range(k)], centers, [sigma for j in range(k)]))
             output.append(calculateOutput(weights, radialZ))
+            radials.append(radialZ)
 
-        err = calculateError(output, y)
-        print(err)
-        
-        if learn:
-            for idw in range(len(weights)):
-                weights[idw] -= alpha * partialDerivative(output, y, 1 if not idw else radialZ[idw - 1])
+
+            if learn:
+                for idw in range(len(weights)):
+                    weights[idw] -= alpha * partialDerivative(output[-1], y[idx], 1 if not idw else radialZ[idw - 1])
+        # err = calculateError(output, y)
+        error.append(calculateError(output, y))
+        if i % 200 == 0:
+            print(error[-1])
         if not learn:
             return output
-        
-        # seed = random.random()
-        # random.seed(seed)
-        # random.shuffle(input)
-        # random.seed(seed)
-        # random.shuffle(y)
+    
+
+    return radials, error
 
 
-k = 4
-iterations = 200
+k = 10
+iterations = 5000
 alpha = 0.01
 eps = 0.01
 learn = True
@@ -92,10 +93,16 @@ sigma = generateSigmas(centers, k)
 # sigma = [random.uniform(0, 3) for i in range(k)]
 weights = generateWeights(k)
 
-findParams(x)
+radials, error = findParams(x)
+plt.plot([i for i in range(len(error))], [i for i in error])
+plt.savefig("error")
+plt.clf()
+for idr in range(1, k + 1):
+    plt.plot([i for i in x], [z[idr - 1] * weights[idr] for z in radials], 'r')
+x, y = readData("test.txt")
 t = np.arange(min(x), max(x), 0.1)
-plt.scatter([i for i in x], [i for i in y], s=3, c='g')
+plt.scatter([i for i in x], [i for i in y], s=2, c='g')
 learn = False
-plt.plot([i for i in t], [i for i in findParams(t)])
+plt.plot([i for i in x], [i for i in findParams(x)], 'b')
 plt.scatter([center for center in centers], [0 for i in range(len(centers))])
 plt.show()
