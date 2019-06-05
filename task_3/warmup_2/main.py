@@ -50,11 +50,11 @@ def calculateError(f, y):
     # return (f - y)**2 / 2
 
 def partialDerivative(f, y, z):
-    # sum = 0
-    # for i in range(len(f)):
-        # sum += (f[i] - y[i]) * z
-    # return (sum / len(f))
-    return ((f - y) * z) / 2
+    sum = 0
+    for i in range(len(f)):
+        sum += (f[i] - y[i]) * z[i]
+    return (sum / len(f))
+    # return ((f - y) * z) / 2
 
 def findParams(x):
     error = []
@@ -67,9 +67,12 @@ def findParams(x):
             radials.append(radialZ)
 
 
-            if learn:
-                for idw in range(len(weights)):
-                    weights[idw] -= alpha * partialDerivative(output[-1], y[idx], 1 if not idw else radialZ[idw - 1])
+            # if learn:
+            #     for idw in range(len(weights)):
+            #         weights[idw] -= alpha * partialDerivative(output[-1], y[idx], [1 if not idw else radial[idw - 1] for radial in radials] )
+        if learn:
+            for idw in range(len(weights)):
+                weights[idw] -= alpha * partialDerivative(output, y, [1 if not idw else radial[idw - 1] for radial in radials] )
         error.append(calculateError(output, y))
         if i % 200 == 0:
             print(error[-1])
