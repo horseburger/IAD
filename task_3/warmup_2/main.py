@@ -62,9 +62,8 @@ def findParams(x):
         radials = []
         output = []
         for idx in range(len(x)):
-            radialZ = list(map(calculateRadial, [x[idx] for j in range(k)], centers, [sigma for j in range(k)]))
-            output.append(calculateOutput(weights, radialZ))
-            radials.append(radialZ)
+            radials.append(list(map(calculateRadial, [x[idx] for j in range(k)], centers, [sigma for j in range(k)])))
+            output.append(calculateOutput(weights, radials[-1]))
 
 
             # if learn:
@@ -83,7 +82,7 @@ def findParams(x):
     return radials, error
 
 
-k = 4
+k = 10
 iterations = 5000
 alpha = 0.01
 eps = 0.01
@@ -92,7 +91,6 @@ learn = True
 x, y = readData("data.txt")
 centers = generateCenters(k, x)
 sigma = generateSigmas(centers, k)
-# sigma = [random.uniform(0, 3) for i in range(k)]
 weights = generateWeights(k)
 
 radials, error = findParams(x)
@@ -107,5 +105,5 @@ plt.scatter([i for i in x], [i for i in y], s=2, c='g')
 learn = False
 plt.plot([i for i in x], [i for i in findParams(x)], 'b')
 plt.scatter([center for center in centers], [0 for i in range(len(centers))])
-# plt.show()
-plt.savefig("out" + str(k))
+plt.show()
+#plt.savefig("out" + str(k))
