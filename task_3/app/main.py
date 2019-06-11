@@ -99,9 +99,24 @@ def findParams(x):
 
 iterations = 15000
 alpha = 0.01
-eps = 0.1
+eps = 0.01
 learn = True
 midDraw = False
+
+k = 11
+x, y = readData("data.txt")
+learn = True
+centers = generateCenters(k, x)
+sigma = generateSigmas(centers, k)
+weights = generateWeights(k)
+radials, error = findParams(x)
+learn = False
+x, y = readData("test.txt")
+plt.scatter(x, y, label="Testing data", c='r', s=2)
+plt.plot(x, findParams(x))
+plt.grid()
+plt.show()
+
 
 # PART 1
 # small [0.1, .8) the error was much bigger than that when using an optimized sigma
@@ -185,24 +200,24 @@ midDraw = False
 # plt.savefig("point2_optimalSigma")
 
 # PART 3
-
-k = 11
-learn = True
-midDraw = False
-x, y = readData("data.txt")
-for k in range(1, 42, 5):
-    error = []
-    for i in range(100):
-        centers = generateCenters(k, x)
-        sigma = random.uniform(1.3, 1.6) if k == 1 else generateSigmas(centers, k)
-        weights = generateWeights(k)
-        error.append((findParams(x)[1])[-1])
-    meanError = (sum(error) / len(error))
-    stdDev = stdDeviation(meanError, error)
-    with open("point3.txt", "a+") as f:
-        f.write("No of neurons = " + str(k) + '\n')
-        f.write("Averge error = " + str(meanError) + '\n')
-        f.write("Standar deviation = " + str(stdDev) + '\n')
+# WARNING --- TAKES A REALLY LONG TIME
+# k = 11
+# learn = True
+# midDraw = False
+# x, y = readData("data.txt")
+# for k in range(26, 42, 5):
+#     error = []
+#     for i in range(100):
+#         centers = generateCenters(k, x)
+#         sigma = random.uniform(1.3, 1.6) if k == 1 else generateSigmas(centers, k)
+#         weights = generateWeights(k)
+#         error.append((findParams(x)[1])[-1])
+#     meanError = (sum(error) / len(error))
+#     stdDev = stdDeviation(meanError, error)
+#     with open("point3.txt", "a+") as f:
+#         f.write("No of neurons = " + str(k) + '\n')
+#         f.write("Averge error = " + str(meanError) + '\n')
+#         f.write("Standar deviation = " + str(stdDev) + '\n')
 
 # PART 4
 # k = 11
